@@ -145,6 +145,9 @@ _static_dir = BASE_DIR / 'static'
 STATICFILES_DIRS = [_static_dir] if _static_dir.is_dir() else []
 
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },

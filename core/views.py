@@ -94,6 +94,8 @@ def start_personal_session(request):
 @login_required
 def lecturer_session(request, session_code):
     session = get_object_or_404(LectureSession, session_code=session_code, lecturer=request.user)
+    if session.session_type == 'personal':
+        return render(request, 'core/personal_session.html', {'session': session})
     attendees = SessionAttendance.objects.filter(session=session)
     slides = SessionSlide.objects.filter(session=session).order_by('slide_number')
     return render(request, 'core/lecturer_session.html', {

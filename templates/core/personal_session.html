@@ -1,0 +1,173 @@
+{% extends 'core/base.html' %}
+{% block title %}Personal Session — SIKIKA{% endblock %}
+
+{% block extra_css %}
+.ps-wrap { max-width: 800px; margin: 0 auto; padding-top: 32px; }
+.ps-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.ps-title { font-family: var(--font-heading); font-weight: 600; font-size: 20px; }
+.ps-timer { font-family: var(--font-heading); font-size: 28px; font-weight: 600; color: var(--text-secondary); letter-spacing: 2px; }
+.ps-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.mic-dot { width: 12px; height: 12px; border-radius: 50%; background: #555; flex-shrink: 0; }
+.mic-dot.active { background: #e84040; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.ps-transcript {
+    min-height: 300px; max-height: 70vh; overflow-y: auto;
+    background: rgba(0,0,0,0.15); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px; font-size: 20px; line-height: 1.9; color: rgba(255,255,255,0.85);
+}
+.ps-interim { margin-top: 12px; font-size: 18px; color: rgba(232,168,56,0.6); min-height: 24px; }
+{% endblock %}
+
+{% block content %}
+<div class="ps-wrap">
+    <!-- Header -->
+    <div class="ps-header">
+        <div>
+            <h3 class="ps-title">{{ session.title }}</h3>
+            <span style="font-size:12px; color:var(--text-muted);">{{ session.created_at|date:"M d, Y — H:i" }}</span>
+        </div>
+        <span class="ps-timer" id="sessionTimer">00:00</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="ps-controls">
+        <div id="micDot" class="mic-dot"></div>
+        <button id="btnStart" class="btn btn-sikika" onclick="startCapture()">Start Listening</button>
+        <button id="btnStop" class="btn btn-outline-sikika" onclick="stopCapture()" style="display:none;">Pause</button>
+        {% if session.status != 'ended' %}
+        <a href="{% url 'end_session' session.session_code %}" class="btn btn-sm" style="margin-left:auto; background:rgba(232,64,64,0.15); color:#e84040; border:1px solid rgba(232,64,64,0.2);" onclick="return confirm('End this session?')">End Session</a>
+        {% endif %}
+    </div>
+
+    <!-- Live Transcript -->
+    <div id="liveTranscript" class="ps-transcript" role="log" aria-live="polite" aria-label="Live captions">
+        <p style="color:var(--text-muted); font-style:italic;">Tap "Start Listening" and place your device near the conversation...</p>
+        <div id="currentLine" class="ps-interim"></div>
+    </div>
+
+    {% if session.status == 'ended' %}
+    <div class="text-center mt-4">
+        <a href="{% url 'session_summary' session.session_code %}" class="btn btn-sikika">View Summary</a>
+        <a href="{% url 'session_replay' session.session_code %}" class="btn btn-outline-sikika">Replay</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const sessionCode = '{{ session.session_code }}';
+const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+let ws;
+let recognition = null;
+let isCapturing = false;
+let timerInterval = null;
+let timerSeconds = 0;
+let interimThrottle = null;
+
+function connectWS() {
+    ws = new WebSocket(wsProtocol + '//' + window.location.host + '/ws/lecture/' + sessionCode + '/');
+    ws.onopen = () => console.log('WS connected');
+    ws.onclose = () => { setTimeout(connectWS, 2000); };
+}
+connectWS();
+
+function startCapture() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition not supported. Please use Chrome.');
+        return;
+    }
+
+    ws.send(JSON.stringify({ type: 'session_start' }));
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                appendFinal(transcript);
+                ws.send(JSON.stringify({ type: 'transcript', text: transcript, is_final: true }));
+            } else {
+                interim += transcript;
+            }
+        }
+        // Show interim text instantly inline
+        const el = document.getElementById('currentLine');
+        el.textContent = interim;
+        // Throttle interim WS sends to every 300ms
+        if (interim && !interimThrottle) {
+            interimThrottle = setTimeout(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'transcript', text: interim, is_final: false }));
+                }
+                interimThrottle = null;
+            }, 300);
+        }
+    };
+
+    recognition.onerror = (event) => {
+        if (event.error === 'no-speech' && isCapturing) {
+            recognition.stop();
+            setTimeout(() => { if (isCapturing) recognition.start(); }, 50);
+        }
+    };
+
+    recognition.onend = () => { if (isCapturing) recognition.start(); };
+
+    recognition.start();
+    isCapturing = true;
+
+    document.getElementById('btnStart').style.display = 'none';
+    document.getElementById('btnStop').style.display = 'inline-block';
+    document.getElementById('micDot').classList.add('active');
+    // Clear placeholder, keep currentLine
+    const transcript = document.getElementById('liveTranscript');
+    const placeholder = transcript.querySelector('p');
+    if (placeholder) placeholder.remove();
+
+    timerSeconds = 0;
+    timerInterval = setInterval(() => {
+        timerSeconds++;
+        const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+        const s = String(timerSeconds % 60).padStart(2, '0');
+        document.getElementById('sessionTimer').textContent = m + ':' + s;
+    }, 1000);
+}
+
+function stopCapture() {
+    isCapturing = false;
+    if (recognition) recognition.stop();
+
+    document.getElementById('btnStart').style.display = 'inline-block';
+    document.getElementById('btnStop').style.display = 'none';
+    document.getElementById('micDot').classList.remove('active');
+    document.getElementById('currentLine').textContent = '';
+
+    if (timerInterval) clearInterval(timerInterval);
+}
+
+function appendFinal(text) {
+    const el = document.getElementById('liveTranscript');
+    const currentLine = document.getElementById('currentLine');
+    const span = document.createElement('span');
+    span.textContent = text + ' ';
+    // Insert before the interim line so final text stays above
+    el.insertBefore(span, currentLine);
+    currentLine.textContent = '';
+    el.scrollTop = el.scrollHeight;
+}
+
+setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'heartbeat' }));
+    }
+}, 30000);
+</script>
+{% endblock %}

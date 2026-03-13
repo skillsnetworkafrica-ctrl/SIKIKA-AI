@@ -195,8 +195,8 @@
         <!-- Live Transcript -->
         <div id="liveTranscript" role="log" aria-live="polite" aria-label="Live transcript" style="min-height:200px; max-height:400px; overflow-y:auto; background:rgba(0,0,0,0.15); border:1px solid var(--border); border-radius:8px; padding:20px; font-size:18px; line-height:1.8; color:rgba(255,255,255,0.8);">
             <p style="color:var(--text-muted); font-style:italic;">Click "Start Speaking" to begin the live session...</p>
+            <div id="currentLine" style="margin-top:12px; font-size:16px; color:rgba(232,168,56,0.7); min-height:24px;"></div>
         </div>
-        <div id="currentLine" style="margin-top:12px; font-size:16px; color:rgba(232,168,56,0.7); min-height:24px;"></div>
     </div>
 
     <!-- Slide Upload & Management -->
@@ -247,6 +247,7 @@ let timerSeconds = 0;
 let totalWords = 0;
 let detectedTermsSet = new Set();
 let lastComplexity = 0;
+let interimThrottle = null;
 
 function connectWS() {
     ws = new WebSocket(wsProtocol + '//' + window.location.host + '/ws/lecture/' + sessionCode + '/');
@@ -330,6 +331,7 @@ function startCapture() {
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
     recognition.lang = 'en-US';
 
     recognition.onresult = (event) => {
@@ -344,8 +346,13 @@ function startCapture() {
             }
         }
         document.getElementById('currentLine').textContent = interim;
-        if (interim) {
-            ws.send(JSON.stringify({ type: 'transcript', text: interim, is_final: false }));
+        if (interim && !interimThrottle) {
+            interimThrottle = setTimeout(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'transcript', text: interim, is_final: false }));
+                }
+                interimThrottle = null;
+            }, 300);
         }
     };
 
@@ -353,7 +360,7 @@ function startCapture() {
         console.error('Speech error:', event.error);
         if (event.error === 'no-speech' && isCapturing) {
             recognition.stop();
-            recognition.start();
+            setTimeout(() => { if (isCapturing) recognition.start(); }, 50);
         }
     };
 
@@ -368,7 +375,10 @@ function startCapture() {
     document.getElementById('btnStop').style.display = 'inline-block';
     document.getElementById('micStatus').classList.add('active');
     document.getElementById('micLabel').textContent = 'Listening...';
-    document.getElementById('liveTranscript').innerHTML = '';
+    // Clear placeholder, keep currentLine
+    const transcript = document.getElementById('liveTranscript');
+    const placeholder = transcript.querySelector('p');
+    if (placeholder) placeholder.remove();
 
     // Start timer
     timerSeconds = 0;
@@ -395,9 +405,11 @@ function stopCapture() {
 
 function appendFinal(text) {
     const el = document.getElementById('liveTranscript');
+    const currentLine = document.getElementById('currentLine');
     const span = document.createElement('span');
     span.textContent = text + ' ';
-    el.appendChild(span);
+    el.insertBefore(span, currentLine);
+    currentLine.textContent = '';
     el.scrollTop = el.scrollHeight;
 }
 
