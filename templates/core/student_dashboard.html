@@ -41,12 +41,64 @@
 
 {% block content %}
 <div class="container mt-5">
+    <!-- Personal Sessions -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 style="font-family:var(--font-heading); font-weight:600;">Your Lectures</h2>
+        <h2 style="font-family:var(--font-heading); font-weight:600;">Your Personal Sessions</h2>
         <div class="d-flex gap-2">
             <a href="{% url 'accessibility_settings' %}" class="btn btn-outline-sikika btn-sm">Settings</a>
-            <a href="{% url 'join_session' %}" class="btn btn-sikika">Join Session</a>
+            <form method="post" action="{% url 'start_personal_session' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sikika">Start Personal Session</button>
+            </form>
         </div>
+    </div>
+
+    {% if hosted_sessions %}
+    <div class="row g-3 mb-5">
+        {% for s in hosted_sessions %}
+        <div class="col-md-4">
+            <div class="session-card">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div>
+                        <h5 style="font-weight:600; margin-bottom:2px; font-size:16px;">{{ s.title }}</h5>
+                    </div>
+                    {% if s.status == 'live' or s.status == 'waiting' %}
+                    <span class="session-status status-live">LIVE</span>
+                    {% else %}
+                    <span class="session-status status-ended">Ended</span>
+                    {% endif %}
+                </div>
+
+                <p class="text-muted mb-0" style="font-size:11px; margin-top:8px;">
+                    {{ s.created_at|date:"M d, H:i" }}
+                    {% if s.segment_count %}&middot; {{ s.segment_count }} segment{{ s.segment_count|pluralize }}{% endif %}
+                    {% if s.duration_minutes %}&middot; {{ s.duration_minutes }} min{% endif %}
+                </p>
+
+                {% if s.status == 'live' or s.status == 'waiting' %}
+                <div class="session-actions">
+                    <a href="{% url 'lecturer_session' s.session_code %}" class="action-btn primary">Resume</a>
+                </div>
+                {% elif s.status == 'ended' %}
+                <div class="session-actions">
+                    <a href="{% url 'session_summary' s.session_code %}" class="action-btn primary">Summary</a>
+                    <a href="{% url 'session_replay' s.session_code %}" class="action-btn">Replay</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="session-card text-center mb-5" style="padding:32px 20px;">
+        <p style="font-size:14px; color:var(--text-secondary); margin:0;">No personal sessions yet. Start one to follow conversations around you with live captions.</p>
+    </div>
+    {% endif %}
+
+    <!-- Joined Lectures -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="font-family:var(--font-heading); font-weight:600;">Joined Lectures</h2>
+        <a href="{% url 'join_session' %}" class="btn btn-sikika">Join Session</a>
     </div>
 
     {% if attendances %}

@@ -47,7 +47,21 @@ def dashboard(request):
         return render(request, 'core/lecturer_dashboard.html', {'sessions': sessions})
     else:
         attendances = SessionAttendance.objects.filter(student=request.user).select_related('session').order_by('-joined_at')
-        return render(request, 'core/student_dashboard.html', {'attendances': attendances})
+        hosted_sessions = LectureSession.objects.filter(
+            lecturer=request.user, session_type='personal'
+        ).order_by('-created_at')
+        for s in hosted_sessions:
+            s.attendee_count = s.attendees.count()
+            s.segment_count = s.segments.count()
+            if s.started_at and s.ended_at:
+                delta = s.ended_at - s.started_at
+                s.duration_minutes = int(delta.total_seconds() // 60)
+            else:
+                s.duration_minutes = None
+        return render(request, 'core/student_dashboard.html', {
+            'attendances': attendances,
+            'hosted_sessions': hosted_sessions,
+        })
 
 
 @login_required
@@ -62,6 +76,19 @@ def create_session(request):
     else:
         form = LectureSessionForm()
     return render(request, 'core/create_session.html', {'form': form})
+
+
+@login_required
+def start_personal_session(request):
+    if request.method == 'POST':
+        now = timezone.now()
+        session = LectureSession.objects.create(
+            lecturer=request.user,
+            title=f"Personal Session — {now.strftime('%b %d, %H:%M')}",
+            session_type='personal',
+        )
+        return redirect('lecturer_session', session_code=session.session_code)
+    return redirect('dashboard')
 
 
 @login_required

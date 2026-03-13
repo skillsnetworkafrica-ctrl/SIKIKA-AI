@@ -39,10 +39,15 @@ class LectureSession(models.Model):
         ('live', 'Live'),
         ('ended', 'Ended'),
     ]
+    SESSION_TYPE_CHOICES = [
+        ('lecture', 'Lecture'),
+        ('personal', 'Personal'),
+    ]
     lecturer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions')
     title = models.CharField(max_length=200)
     course_code = models.CharField(max_length=50, blank=True)
     session_code = models.CharField(max_length=6, unique=True, editable=False)
+    session_type = models.CharField(max_length=10, choices=SESSION_TYPE_CHOICES, default='lecture')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='waiting')
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)

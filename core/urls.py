@@ -10,6 +10,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('settings/accessibility/', views.accessibility_settings, name='accessibility_settings'),
     path('session/create/', views.create_session, name='create_session'),
+    path('personal/start/', views.start_personal_session, name='start_personal_session'),
     path('session/<str:session_code>/', views.lecturer_session, name='lecturer_session'),
     path('session/<str:session_code>/end/', views.end_session, name='end_session'),
     path('session/<str:session_code>/transcript/', views.session_transcript, name='session_transcript'),
