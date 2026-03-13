@@ -159,6 +159,21 @@ class QuizQuestion(models.Model):
         return f"Q{self.order}: {self.question_text[:60]}..."
 
 
+class StudentNote(models.Model):
+    """Student personal notes taken during a live session."""
+    session = models.ForeignKey(LectureSession, on_delete=models.CASCADE, related_name='notes')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='session_notes')
+    text = models.TextField()
+    timestamp_seconds = models.FloatField(default=0, help_text='Seconds from session start when note was taken')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp_seconds']
+
+    def __str__(self):
+        return f"Note by {self.student.username} at {self.timestamp_seconds:.0f}s"
+
+
 class LectureAnalytics(models.Model):
     """AI-computed analytics for a lecture session."""
     session = models.OneToOneField(LectureSession, on_delete=models.CASCADE, related_name='analytics')
@@ -176,6 +191,3 @@ class LectureAnalytics(models.Model):
 
     def __str__(self):
         return f"Analytics — {self.session.title}"
-
-    def __str__(self):
-        return f"{self.student.username} in {self.session.session_code}"

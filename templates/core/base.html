@@ -61,6 +61,9 @@
         .navbar {
             background: var(--navy-light) !important;
             border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1050;
         }
         .navbar-brand {
             font-family: var(--font-heading);
@@ -95,7 +98,7 @@
         .card-dark {
             background: var(--navy-light);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 8px;
         }
         .form-control, .form-select {
             background: rgba(255,255,255,0.05);
@@ -138,14 +141,13 @@
             background: var(--navy-lighter); border: 1px solid var(--border);
             color: var(--orange); font-size: 22px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer; transition: all 0.2s; padding: 0;
         }
         .a11y-toggle:hover { border-color: var(--orange); transform: scale(1.1); }
         .a11y-menu {
             display: none; position: absolute; bottom: 56px; right: 0;
             background: var(--navy-light); border: 1px solid var(--border);
-            border-radius: 12px; padding: 16px; width: 220px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border-radius: 8px; padding: 16px; width: 220px;
         }
         .a11y-menu.show { display: block; }
         .a11y-menu label { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 0; font-size: 13px; color: var(--text-secondary); }
@@ -183,7 +185,7 @@
     {% if messages %}
     <div class="container mt-3" role="alert">
         {% for message in messages %}
-        <div class="alert alert-dismissible fade show" style="background:rgba(232,168,56,0.1); border-color:rgba(232,168,56,0.2); color:#fff; border-radius:10px;">
+        <div class="alert alert-dismissible fade show" style="background:rgba(232,168,56,0.1); border-color:rgba(232,168,56,0.2); color:#fff; border-radius:8px;">
             {{ message }}
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -198,7 +200,7 @@
     <!-- Accessibility Quick Panel -->
     {% if user.is_authenticated %}
     <div class="a11y-panel" role="region" aria-label="Accessibility controls">
-        <div class="a11y-toggle" onclick="toggleA11yMenu()" title="Accessibility Settings" aria-label="Accessibility Settings" tabindex="0">♿</div>
+        <button class="a11y-toggle" onclick="toggleA11yMenu()" title="Accessibility Settings" aria-label="Accessibility Settings" role="button" aria-expanded="false" id="a11yToggleBtn">♿</button>
         <div class="a11y-menu" id="a11yMenu">
             <p style="font-size:12px; font-weight:600; color:var(--orange); margin-bottom:8px; letter-spacing:1px;">ACCESSIBILITY</p>
             <label><input type="checkbox" id="toggleContrast" onchange="toggleContrast()"> High Contrast</label>
@@ -219,7 +221,10 @@
     <script>
     // Accessibility panel
     function toggleA11yMenu() {
-        document.getElementById('a11yMenu').classList.toggle('show');
+        const menu = document.getElementById('a11yMenu');
+        const btn = document.getElementById('a11yToggleBtn');
+        menu.classList.toggle('show');
+        btn.setAttribute('aria-expanded', menu.classList.contains('show'));
     }
     function toggleContrast() {
         document.body.classList.toggle('high-contrast');

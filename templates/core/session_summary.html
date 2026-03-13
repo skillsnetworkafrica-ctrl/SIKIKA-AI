@@ -3,61 +3,53 @@
 
 {% block extra_css %}
 .summary-hero {
-    background: linear-gradient(135deg, rgba(232,168,56,0.08) 0%, rgba(56,212,232,0.05) 100%);
+    background: var(--navy-light);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 8px;
     padding: 32px;
-    position: relative;
-    overflow: hidden;
-}
-.summary-hero::before {
-    content: '🧠';
-    position: absolute;
-    top: -20px; right: -10px;
-    font-size: 120px;
-    opacity: 0.06;
 }
 .ai-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: linear-gradient(135deg, rgba(232,168,56,0.2), rgba(56,212,232,0.15));
-    border: 1px solid rgba(232,168,56,0.3);
-    border-radius: 100px; padding: 4px 14px;
+    background: rgba(232,168,56,0.1);
+    border: 1px solid rgba(232,168,56,0.2);
+    border-radius: 4px; padding: 4px 12px;
     font-size: 11px; font-weight: 600; letter-spacing: 1px;
     color: var(--orange);
 }
 .summary-text {
     font-size: 17px; line-height: 1.9;
     color: rgba(255,255,255,0.85);
-    background: rgba(0,0,0,0.2);
-    border-radius: 12px; padding: 24px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 8px; padding: 24px;
     border-left: 3px solid var(--orange);
 }
 .key-point {
     display: flex; gap: 12px; padding: 12px 16px;
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 10px; margin-bottom: 8px;
+    border-radius: 8px; margin-bottom: 8px;
     transition: border-color 0.2s;
 }
 .key-point:hover { border-color: var(--orange); }
 .kp-icon {
-    width: 32px; height: 32px; border-radius: 8px;
+    width: 32px; height: 32px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    color: var(--text-secondary);
 }
-.kp-definition .kp-icon { background: rgba(56,232,112,0.1); }
-.kp-emphasis .kp-icon { background: rgba(232,64,64,0.1); }
-.kp-example .kp-icon { background: rgba(56,212,232,0.1); }
-.kp-conclusion .kp-icon { background: rgba(232,168,56,0.1); }
-.kp-instruction .kp-icon { background: rgba(232,64,64,0.15); }
-.kp-comparison .kp-icon { background: rgba(169,112,255,0.1); }
-.kp-enumeration .kp-icon { background: rgba(255,200,100,0.1); }
-.kp-evaluation .kp-icon { background: rgba(100,200,255,0.1); }
+.kp-definition .kp-icon { background: rgba(56,232,112,0.1); color: var(--green); }
+.kp-emphasis .kp-icon { background: rgba(232,64,64,0.1); color: var(--red); }
+.kp-example .kp-icon { background: rgba(56,212,232,0.1); color: var(--cyan); }
+.kp-conclusion .kp-icon { background: rgba(232,168,56,0.1); color: var(--orange); }
+.kp-instruction .kp-icon { background: rgba(232,64,64,0.15); color: var(--red); }
+.kp-comparison .kp-icon { background: rgba(169,112,255,0.1); color: #a970ff; }
+.kp-enumeration .kp-icon { background: rgba(255,200,100,0.1); color: #ffc864; }
+.kp-evaluation .kp-icon { background: rgba(100,200,255,0.1); color: #64c8ff; }
 .kp-text { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8); }
 .kp-type { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 4px; }
 .keyword-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
 .kw-tag {
-    padding: 4px 12px; border-radius: 100px;
+    padding: 4px 12px; border-radius: 4px;
     font-size: 12px; border: 1px solid var(--border);
     color: var(--text-secondary);
     transition: all 0.2s;
@@ -68,20 +60,20 @@
     display: inline-flex; align-items: center; gap: 4px;
     background: rgba(232,168,56,0.1);
     border: 1px solid rgba(232,168,56,0.2);
-    border-radius: 6px; padding: 3px 10px;
+    border-radius: 4px; padding: 3px 10px;
     font-size: 12px; color: var(--orange);
 }
 .stat-card {
     text-align: center; padding: 20px;
-    background: rgba(255,255,255,0.02);
+    background: var(--navy-light);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 8px;
 }
 .stat-card .stat-value { font-size: 28px; font-weight: 700; color: var(--orange); font-family: var(--font-heading); }
 .stat-card .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-.nav-pills-ai { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-pills-ai { display: flex; gap: 6px; flex-wrap: wrap; }
 .nav-pills-ai a {
-    padding: 8px 20px; border-radius: 100px;
+    padding: 8px 18px; border-radius: 6px;
     font-size: 13px; font-weight: 500;
     text-decoration: none; border: 1px solid var(--border);
     color: var(--text-secondary);
@@ -103,22 +95,22 @@
     <div class="summary-hero mb-4">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
             <div>
-                <span class="ai-badge">🧠 AI GENERATED</span>
+                <span class="ai-badge">AI GENERATED</span>
                 <h3 style="font-family:var(--font-heading); font-weight:600; margin-top:12px; margin-bottom:4px;">{{ session.title }}</h3>
                 <p class="text-muted mb-0" style="font-size:14px;">{{ session.course_code }} &middot; {{ session.created_at|date:"F d, Y" }}</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="{% url 'analyze_session' session.session_code %}" class="btn btn-outline-sikika btn-sm" title="Re-run AI analysis">🔄 Re-analyze</a>
+                <a href="{% url 'analyze_session' session.session_code %}" class="btn btn-outline-sikika btn-sm" title="Re-run AI analysis">Re-analyze</a>
             </div>
         </div>
 
         <!-- Nav pills -->
         <div class="nav-pills-ai">
-            <a href="{% url 'session_summary' session.session_code %}" class="active">📝 Summary</a>
-            <a href="{% url 'session_analytics' session.session_code %}">📊 Analytics</a>
-            <a href="{% url 'session_quiz' session.session_code %}">🧪 Quiz</a>
-            <a href="{% url 'session_transcript' session.session_code %}">📄 Transcript</a>
-            <a href="{% url 'download_transcript' session.session_code %}">📥 Download</a>
+            <a href="{% url 'session_summary' session.session_code %}" class="active">Summary</a>
+            <a href="{% url 'session_analytics' session.session_code %}">Analytics</a>
+            <a href="{% url 'session_quiz' session.session_code %}">Quiz</a>
+            <a href="{% url 'session_transcript' session.session_code %}">Transcript</a>
+            <a href="{% url 'download_transcript' session.session_code %}">Download</a>
         </div>
     </div>
 
@@ -155,25 +147,25 @@
     {% if summary %}
     <!-- AI Summary -->
     <div class="card-dark p-4 mb-4">
-        <h5 style="font-weight:600; margin-bottom:16px;">🧠 AI Summary</h5>
+        <h5 style="font-weight:600; margin-bottom:16px;">AI Summary</h5>
         <div class="summary-text">{{ summary.summary_text }}</div>
     </div>
 
     <!-- Key Points -->
     {% if summary.key_points %}
     <div class="card-dark p-4 mb-4">
-        <h5 style="font-weight:600; margin-bottom:16px;">🎯 Key Points <span style="font-size:12px; color:var(--text-muted); font-weight:400;">({{ summary.key_points|length }} detected)</span></h5>
+        <h5 style="font-weight:600; margin-bottom:16px;">Key Points <span style="font-size:12px; color:var(--text-muted); font-weight:400;">({{ summary.key_points|length }} detected)</span></h5>
         {% for point in summary.key_points %}
         <div class="key-point kp-{{ point.type }}">
             <div class="kp-icon">
-                {% if point.type == 'definition' %}📖
-                {% elif point.type == 'emphasis' %}❗
-                {% elif point.type == 'example' %}💡
-                {% elif point.type == 'conclusion' %}🎯
-                {% elif point.type == 'instruction' %}📌
-                {% elif point.type == 'comparison' %}⚖️
-                {% elif point.type == 'enumeration' %}📋
-                {% elif point.type == 'evaluation' %}⭐
+                {% if point.type == 'definition' %}DEF
+                {% elif point.type == 'emphasis' %}EMP
+                {% elif point.type == 'example' %}EX
+                {% elif point.type == 'conclusion' %}CON
+                {% elif point.type == 'instruction' %}INS
+                {% elif point.type == 'comparison' %}CMP
+                {% elif point.type == 'enumeration' %}LST
+                {% elif point.type == 'evaluation' %}EVL
                 {% else %}•{% endif %}
             </div>
             <div>
@@ -188,7 +180,7 @@
     <!-- Keywords -->
     {% if summary.keywords %}
     <div class="card-dark p-4 mb-4">
-        <h5 style="font-weight:600; margin-bottom:16px;">🔑 Top Keywords</h5>
+        <h5 style="font-weight:600; margin-bottom:16px;">Top Keywords</h5>
         <div class="keyword-cloud">
             {% for kw in summary.keywords %}
             <span class="kw-tag">{{ kw.0 }}<span class="kw-count">×{{ kw.1 }}</span></span>
@@ -200,7 +192,7 @@
     <!-- Detected Technical Terms -->
     {% if summary.detected_terms %}
     <div class="card-dark p-4 mb-4">
-        <h5 style="font-weight:600; margin-bottom:16px;">🔬 Technical Terms Detected <span style="font-size:12px; color:var(--text-muted); font-weight:400;">(from glossary)</span></h5>
+        <h5 style="font-weight:600; margin-bottom:16px;">Technical Terms Detected <span style="font-size:12px; color:var(--text-muted); font-weight:400;">(from glossary)</span></h5>
         <div class="d-flex flex-wrap gap-2">
             {% for term in summary.detected_terms %}
             <span class="detected-term">{{ term }}</span>
@@ -210,8 +202,7 @@
     {% endif %}
     {% else %}
     <div class="card-dark p-5 text-center">
-        <p style="font-size:48px; margin-bottom:16px;">🧠</p>
-        <p style="color:var(--text-secondary);">No AI analysis available yet.</p>
+        <p style="color:var(--text-secondary); margin-bottom:16px;">No AI analysis available yet.</p>
         <a href="{% url 'analyze_session' session.session_code %}" class="btn btn-sikika">Generate AI Summary</a>
     </div>
     {% endif %}

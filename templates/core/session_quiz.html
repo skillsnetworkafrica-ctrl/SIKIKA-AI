@@ -127,7 +127,7 @@
     <div class="mb-3">
         <div class="d-flex justify-content-between mb-1">
             <span style="font-size:12px; color:var(--text-muted);" id="progressLabel">Question 1 of {{ questions|length }}</span>
-            <span style="font-size:12px; color:var(--orange);" id="scoreLabel">Score: 0/0</span>
+            <span style="font-size:12px; color:var(--orange);" id="scoreLabel" role="status" aria-live="polite">Score: 0/0</span>
         </div>
         <div class="quiz-progress">
             <div class="quiz-progress-bar" id="progressBar" style="width:0%"></div>
@@ -172,7 +172,7 @@
             <div class="hint-box" id="hint{{ q.order }}" style="display:none;">💡 {{ q.hint }}</div>
             {% endif %}
 
-            <div class="feedback" id="feedback{{ q.order }}"></div>
+            <div class="feedback" id="feedback{{ q.order }}" role="alert" aria-live="assertive"></div>
 
             <div class="d-flex justify-content-between mt-3">
                 {% if q.question_type != 'true_false' %}
@@ -189,7 +189,7 @@
     </div>
 
     <!-- Score Display (hidden initially) -->
-    <div class="score-display" id="scoreDisplay" style="display:none;">
+    <div class="score-display" id="scoreDisplay" style="display:none;" role="alert" aria-live="assertive">
         <div class="score-circle">
             <div class="score-num" id="finalScore">0</div>
             <div class="score-total" id="finalTotal">/ 0</div>

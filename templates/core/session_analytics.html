@@ -4,15 +4,13 @@
 
 {% block extra_css %}
 .analytics-hero {
-    background: linear-gradient(135deg, rgba(56,212,232,0.06) 0%, rgba(232,168,56,0.06) 100%);
-    border: 1px solid var(--border); border-radius: 16px;
-    padding: 32px; position: relative; overflow: hidden;
+    background: var(--navy-light);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 32px;
 }
-.analytics-hero::before { content: '📊'; position: absolute; top: -20px; right: -10px; font-size: 120px; opacity: 0.06; }
 .metric-card {
-    background: rgba(0,0,0,0.2); border: 1px solid var(--border);
-    border-radius: 14px; padding: 24px; text-align: center;
-    position: relative; overflow: hidden;
+    background: var(--navy-light); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px; text-align: center;
 }
 .metric-value {
     font-size: 36px; font-weight: 700; font-family: var(--font-heading);
@@ -41,7 +39,7 @@
 .gauge-fill.high { background: linear-gradient(90deg, #e8a838, #e84040); }
 .gauge-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
 /* WPM Chart */
-.wpm-chart { position: relative; height: 200px; background: rgba(0,0,0,0.15); border-radius: 10px; padding: 16px; overflow: hidden; }
+.wpm-chart { position: relative; height: 200px; background: rgba(0,0,0,0.15); border-radius: 8px; padding: 16px; overflow: hidden; }
 .wpm-bar-container {
     display: flex; align-items: flex-end; gap: 2px;
     height: 140px; padding: 0 10px;
@@ -65,7 +63,7 @@
 .topic-segment {
     display: flex; gap: 16px; padding: 14px 16px;
     background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 10px; margin-bottom: 8px;
+    border-radius: 8px; margin-bottom: 8px;
 }
 .topic-time {
     font-family: var(--font-heading); font-size: 13px;
@@ -74,22 +72,22 @@
 .topic-label { font-size: 14px; color: rgba(255,255,255,0.8); }
 .topic-keywords { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
 .topic-kw {
-    font-size: 11px; padding: 2px 8px; border-radius: 100px;
+    font-size: 11px; padding: 2px 8px; border-radius: 4px;
     background: rgba(56,212,232,0.08); color: var(--cyan);
     border: 1px solid rgba(56,212,232,0.15);
 }
 /* Mode distribution */
 .mode-bar {
-    display: flex; height: 32px; border-radius: 10px; overflow: hidden;
+    display: flex; height: 32px; border-radius: 6px; overflow: hidden;
     background: rgba(255,255,255,0.05); margin-bottom: 8px;
 }
 .mode-bar-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
 .mode-bar-caption { background: rgba(56,212,232,0.3); color: var(--cyan); }
 .mode-bar-audio { background: rgba(232,168,56,0.3); color: var(--orange); }
 .mode-bar-sign { background: rgba(56,232,112,0.3); color: var(--green); }
-.nav-pills-ai { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-pills-ai { display: flex; gap: 6px; flex-wrap: wrap; }
 .nav-pills-ai a {
-    padding: 8px 20px; border-radius: 100px;
+    padding: 8px 18px; border-radius: 6px;
     font-size: 13px; font-weight: 500;
     text-decoration: none; border: 1px solid var(--border);
     color: var(--text-secondary); transition: all 0.2s;
@@ -110,18 +108,18 @@
     <div class="analytics-hero mb-4">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
             <div>
-                <span style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(56,212,232,0.2),rgba(232,168,56,0.15));border:1px solid rgba(56,212,232,0.3);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:1px;color:var(--cyan);">📊 AI ANALYTICS</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(56,212,232,0.1);border:1px solid rgba(56,212,232,0.2);border-radius:4px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:1px;color:var(--cyan);">AI ANALYTICS</span>
                 <h3 style="font-family:var(--font-heading); font-weight:600; margin-top:12px; margin-bottom:4px;">{{ session.title }}</h3>
                 <p class="text-muted mb-0" style="font-size:14px;">{{ session.course_code }} &middot; {{ session.created_at|date:"F d, Y" }}</p>
             </div>
-            <a href="{% url 'analyze_session' session.session_code %}" class="btn btn-outline-sikika btn-sm">🔄 Re-analyze</a>
+            <a href="{% url 'analyze_session' session.session_code %}" class="btn btn-outline-sikika btn-sm">Re-analyze</a>
         </div>
 
         <div class="nav-pills-ai">
-            <a href="{% url 'session_summary' session.session_code %}">📝 Summary</a>
-            <a href="{% url 'session_analytics' session.session_code %}" class="active">📊 Analytics</a>
-            <a href="{% url 'session_quiz' session.session_code %}">🧪 Quiz</a>
-            <a href="{% url 'session_transcript' session.session_code %}">📄 Transcript</a>
+            <a href="{% url 'session_summary' session.session_code %}">Summary</a>
+            <a href="{% url 'session_analytics' session.session_code %}" class="active">Analytics</a>
+            <a href="{% url 'session_quiz' session.session_code %}">Quiz</a>
+            <a href="{% url 'session_transcript' session.session_code %}">Transcript</a>
         </div>
     </div>
 
@@ -139,10 +137,10 @@
                 <div class="metric-value">{{ analytics.avg_wpm|floatformat:"0" }}</div>
                 <div class="metric-label">Avg Words/Min</div>
                 <div class="metric-sub">
-                    {% if analytics.avg_wpm < 100 %}🐢 Slow pace
-                    {% elif analytics.avg_wpm < 150 %}✅ Good pace
-                    {% elif analytics.avg_wpm < 180 %}⚡ Fast pace
-                    {% else %}🔥 Very fast{% endif %}
+                    {% if analytics.avg_wpm < 100 %}Slow pace
+                    {% elif analytics.avg_wpm < 150 %}Good pace
+                    {% elif analytics.avg_wpm < 180 %}Fast pace
+                    {% else %}Very fast{% endif %}
                 </div>
             </div>
         </div>
@@ -166,7 +164,7 @@
     <div class="row g-3 mb-4">
         <div class="col-md-6">
             <div class="card-dark p-4">
-                <h6 style="font-weight:600; margin-bottom:16px;">🎚️ Complexity Score</h6>
+                <h6 style="font-weight:600; margin-bottom:16px;">Complexity Score</h6>
                 <div class="text-center mb-2">
                     <span style="font-size:32px; font-weight:700; font-family:var(--font-heading); color:var(--orange);">{{ analytics.complexity_score|floatformat:"0" }}<span style="font-size:16px; color:var(--text-muted);">/100</span></span>
                     <div style="font-size:14px; color:var(--text-secondary); margin-top:4px;">{{ analytics.complexity_label }}</div>
@@ -183,7 +181,7 @@
         </div>
         <div class="col-md-6">
             <div class="card-dark p-4">
-                <h6 style="font-weight:600; margin-bottom:16px;">📖 Reading Ease</h6>
+                <h6 style="font-weight:600; margin-bottom:16px;">Reading Ease</h6>
                 <div class="text-center mb-2">
                     <span style="font-size:32px; font-weight:700; font-family:var(--font-heading); color:var(--cyan);">{{ analytics.reading_ease|floatformat:"0" }}<span style="font-size:16px; color:var(--text-muted);">/100</span></span>
                     <div style="font-size:14px; color:var(--text-secondary); margin-top:4px;">
@@ -209,7 +207,7 @@
     <!-- WPM Timeline Chart -->
     {% if analytics.wpm_timeline %}
     <div class="card-dark p-4 mb-4">
-        <h6 style="font-weight:600; margin-bottom:16px;">📈 Speaking Pace Over Time</h6>
+        <h6 style="font-weight:600; margin-bottom:16px;">Speaking Pace Over Time</h6>
         <div class="wpm-chart">
             <div class="wpm-bar-container" id="wpmChart">
                 {% for point in analytics.wpm_timeline %}
@@ -230,7 +228,7 @@
     <!-- Topic Segments -->
     {% if analytics.topic_segments %}
     <div class="card-dark p-4 mb-4">
-        <h6 style="font-weight:600; margin-bottom:16px;">🗂️ Topic Segments <span style="font-size:12px; color:var(--text-muted); font-weight:400;">({{ analytics.topic_segments|length }} detected)</span></h6>
+        <h6 style="font-weight:600; margin-bottom:16px;">Topic Segments <span style="font-size:12px; color:var(--text-muted); font-weight:400;">({{ analytics.topic_segments|length }} detected)</span></h6>
         {% for topic in analytics.topic_segments %}
         <div class="topic-segment">
             <div class="topic-time">
@@ -256,16 +254,16 @@
     <!-- Audience Distribution -->
     {% if attendee_count > 0 %}
     <div class="card-dark p-4 mb-4">
-        <h6 style="font-weight:600; margin-bottom:16px;">👥 Audience Mode Distribution</h6>
+        <h6 style="font-weight:600; margin-bottom:16px;">Audience Mode Distribution</h6>
         <div class="mode-bar">
             {% if mode_counts.caption %}
-            <div class="mode-bar-seg mode-bar-caption" style="width:{% widthratio mode_counts.caption attendee_count 100 %}%">🔤 {{ mode_counts.caption }}</div>
+            <div class="mode-bar-seg mode-bar-caption" style="width:{% widthratio mode_counts.caption attendee_count 100 %}%">CC {{ mode_counts.caption }}</div>
             {% endif %}
             {% if mode_counts.audio %}
-            <div class="mode-bar-seg mode-bar-audio" style="width:{% widthratio mode_counts.audio attendee_count 100 %}%">🔊 {{ mode_counts.audio }}</div>
+            <div class="mode-bar-seg mode-bar-audio" style="width:{% widthratio mode_counts.audio attendee_count 100 %}%">AUD {{ mode_counts.audio }}</div>
             {% endif %}
             {% if mode_counts.sign %}
-            <div class="mode-bar-seg mode-bar-sign" style="width:{% widthratio mode_counts.sign attendee_count 100 %}%">🤟 {{ mode_counts.sign }}</div>
+            <div class="mode-bar-seg mode-bar-sign" style="width:{% widthratio mode_counts.sign attendee_count 100 %}%">ASL {{ mode_counts.sign }}</div>
             {% endif %}
         </div>
         <div class="d-flex justify-content-between" style="font-size:12px; color:var(--text-muted);">
@@ -277,7 +275,7 @@
 
     <!-- Session Info -->
     <div class="card-dark p-4 mb-4">
-        <h6 style="font-weight:600; margin-bottom:16px;">📋 Quick Stats</h6>
+        <h6 style="font-weight:600; margin-bottom:16px;">Quick Stats</h6>
         <div class="row g-3">
             <div class="col-6 col-md-4">
                 <div style="font-size:13px; color:var(--text-muted);">Total Sentences</div>
@@ -296,8 +294,7 @@
 
     {% else %}
     <div class="card-dark p-5 text-center">
-        <p style="font-size:48px; margin-bottom:16px;">📊</p>
-        <p style="color:var(--text-secondary);">No analytics available yet.</p>
+        <p style="color:var(--text-secondary); margin-bottom:16px;">No analytics available yet.</p>
         <a href="{% url 'analyze_session' session.session_code %}" class="btn btn-sikika">Generate Analytics</a>
     </div>
     {% endif %}

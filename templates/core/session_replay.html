@@ -1,0 +1,408 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Replay — {{ session.title }} | SIKIKA{% endblock %}
+
+{% block extra_css %}
+.replay-container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+.replay-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+.replay-title { font-family: var(--font-heading); font-size: 22px; font-weight: 700; }
+.replay-meta { font-size: 13px; color: var(--text-muted); }
+
+/* Player Controls */
+.player-bar {
+    background: var(--navy-light); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; margin-bottom: 20px;
+    position: sticky; top: 0; z-index: 10;
+}
+.timeline-slider {
+    width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+    background: rgba(255,255,255,0.08); border-radius: 3px; outline: none;
+    cursor: pointer; margin: 12px 0;
+}
+.timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--orange); cursor: pointer; border: 2px solid var(--navy);
+}
+.player-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.play-btn {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--orange); color: var(--navy); border: none;
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+}
+.play-btn:hover { background: #d49730; transform: scale(1.05); }
+.time-display { font-family: var(--font-heading); font-size: 14px; color: var(--text-secondary); }
+.speed-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: var(--text-secondary); border-radius: 6px; padding: 4px 10px;
+    font-size: 12px; cursor: pointer;
+}
+.speed-btn.active { border-color: var(--orange); color: var(--orange); }
+
+/* Transcript Panel */
+.transcript-panel {
+    background: var(--navy-light); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; max-height: 500px; overflow-y: auto;
+    margin-bottom: 20px;
+}
+.seg-row {
+    display: flex; gap: 12px; padding: 10px 12px; border-radius: 8px;
+    transition: background 0.2s; cursor: pointer;
+}
+.seg-row:hover { background: rgba(255,255,255,0.03); }
+.seg-row.active { background: rgba(232,168,56,0.08); border-left: 3px solid var(--orange); }
+.seg-row.played { opacity: 0.5; }
+.seg-time {
+    font-family: var(--font-heading); font-size: 12px; color: var(--orange);
+    min-width: 48px; padding-top: 2px;
+}
+.seg-text { font-size: 15px; line-height: 1.6; }
+.seg-terms { color: var(--cyan); font-weight: 600; }
+
+/* Side Panels */
+.side-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width: 768px) { .side-grid { grid-template-columns: 1fr; } }
+
+.side-panel {
+    background: var(--navy-light); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+}
+.side-panel h3 {
+    font-family: var(--font-heading); font-size: 15px; font-weight: 600;
+    color: var(--orange); margin-bottom: 14px;
+}
+
+/* Notes */
+.note-item {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px;
+}
+.note-time { font-size: 11px; color: var(--orange); font-family: var(--font-heading); }
+.note-del { color: var(--red); cursor: pointer; font-size: 12px; opacity: 0.6; }
+.note-del:hover { opacity: 1; }
+
+/* Slides */
+.slide-thumb {
+    width: 100%; border-radius: 8px; border: 1px solid var(--border);
+    margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s;
+}
+.slide-thumb:hover { border-color: var(--orange); }
+.slide-thumb.active { border-color: var(--orange); box-shadow: 0 0 0 2px rgba(232,168,56,0.3); }
+.slide-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+
+/* Summary box */
+.summary-box { font-size: 14px; line-height: 1.7; color: var(--text-secondary); }
+
+/* Action bar */
+.action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; margin-bottom: 40px; }
+
+/* Audio mode controls */
+.replay-audio-bar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 10px 16px; background: rgba(56,232,112,0.04);
+    border: 1px solid rgba(56,232,112,0.1); border-radius: 10px;
+    margin-bottom: 16px;
+}
+.replay-audio-bar label { font-size: 12px; color: var(--text-secondary); }
+.replay-audio-bar .audio-toggle {
+    background: rgba(56,232,112,0.15); color: var(--green);
+    border: 1px solid rgba(56,232,112,0.3); border-radius: 8px;
+    padding: 6px 14px; cursor: pointer; font-weight: 600; font-size: 13px;
+}
+.replay-audio-bar .audio-toggle:hover { background: rgba(56,232,112,0.25); }
+.replay-audio-bar .audio-toggle.off { color: var(--text-muted); border-color: var(--border); background: rgba(255,255,255,0.05); }
+{% endblock %}
+
+{% block content %}
+<div class="replay-container" role="main" aria-label="Session replay">
+    <!-- Header -->
+    <div class="replay-header">
+        <div>
+            <div class="replay-title">{{ session.title }} — Replay</div>
+            <div class="replay-meta">{{ session.course_code }} · {{ session.created_at|date:"M d, Y" }} · {{ duration|floatformat:0 }}s total</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'session_transcript' session.session_code %}" class="btn btn-outline-sikika btn-sm">Transcript</a>
+            <a href="{% url 'session_summary' session.session_code %}" class="btn btn-outline-sikika btn-sm">Summary</a>
+            <a href="{% url 'session_quiz' session.session_code %}" class="btn btn-outline-sikika btn-sm">Quiz</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-sikika btn-sm">← Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Player Bar -->
+    <div class="player-bar" role="region" aria-label="Playback controls">
+        <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="{{ duration }}" value="0"
+               aria-label="Playback position" aria-valuemin="0" aria-valuemax="{{ duration }}">
+        <div class="player-controls">
+            <button class="play-btn" id="playBtn" aria-label="Play" onclick="togglePlay()">▶</button>
+            <span class="time-display" id="timeDisplay">00:00 / {{ duration|floatformat:0 }}s</span>
+            <div class="ms-auto d-flex gap-2">
+                <button class="speed-btn" onclick="setSpeed(0.5)">0.5×</button>
+                <button class="speed-btn active" onclick="setSpeed(1)">1×</button>
+                <button class="speed-btn" onclick="setSpeed(1.5)">1.5×</button>
+                <button class="speed-btn" onclick="setSpeed(2)">2×</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Narration Controls (for blind students) -->
+    <div class="replay-audio-bar" role="region" aria-label="Audio narration controls">
+        <span style="font-size: 12px; color: var(--green); font-weight: 600;">Audio Narration</span>
+        <button class="audio-toggle" id="audioToggle" onclick="toggleReplayAudio()" aria-label="Toggle audio narration">Audio ON</button>
+        <label for="replayRate">Speed:</label>
+        <input type="range" id="replayRate" min="0.5" max="2" step="0.1" value="1" style="width:80px;" aria-label="Narration speed" onchange="replayAudioRate=parseFloat(this.value)">
+        <span id="replayRateLabel" style="font-size:11px; color:var(--text-muted);">1.0×</span>
+    </div>
+
+    <!-- Transcript -->
+    <div class="transcript-panel" id="transcriptPanel" role="region" aria-label="Transcript segments" aria-live="polite">
+        {% for seg in segments %}
+        <div class="seg-row" id="seg-{{ forloop.counter0 }}" data-time="{{ seg.seconds_from_start|floatformat:1 }}" onclick="seekTo({{ seg.seconds_from_start|floatformat:1 }})">
+            <div class="seg-time">{{ seg.seconds_from_start|floatformat:0 }}s</div>
+            <div class="seg-text {% if seg.has_technical_terms %}seg-terms{% endif %}">{{ seg.text }}</div>
+        </div>
+        {% empty %}
+        <div style="text-align:center; color:var(--text-muted); padding:40px;">No transcript segments recorded.</div>
+        {% endfor %}
+    </div>
+
+    <!-- Side Panels -->
+    <div class="side-grid">
+        <!-- Notes Panel -->
+        <div class="side-panel" role="region" aria-label="Your notes">
+            <h3>Your Notes</h3>
+            <div id="notesContainer">
+                {% for note in notes %}
+                <div class="note-item" id="note-{{ note.id }}">
+                    <div class="d-flex justify-content-between">
+                        <span class="note-time">{{ note.timestamp_seconds|floatformat:0 }}s</span>
+                        <span class="note-del" onclick="deleteNote({{ note.id }})" aria-label="Delete note">✕</span>
+                    </div>
+                    <div>{{ note.text }}</div>
+                </div>
+                {% empty %}
+                <div style="color:var(--text-muted); font-size:13px;">No notes yet. Add notes during live sessions!</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Slides Panel -->
+        <div class="side-panel" role="region" aria-label="Session slides">
+            <h3>Slides</h3>
+            {% for slide in slides %}
+            <img src="{{ slide.image.url }}" alt="Slide {{ slide.slide_number }}: {{ slide.ai_description|default:'No description' }}"
+                 class="slide-thumb" loading="lazy">
+            {% if slide.ai_description %}
+            <div class="slide-desc">{{ slide.ai_description }}</div>
+            {% endif %}
+            {% empty %}
+            <div style="color:var(--text-muted); font-size:13px;">No slides uploaded for this session.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Summary -->
+    {% if summary %}
+    <div class="side-panel mt-3" role="region" aria-label="AI Summary">
+        <h3>AI Summary</h3>
+        <div class="summary-box">{{ summary.summary_text }}</div>
+        {% if summary.key_points %}
+        <div class="mt-3">
+            <strong style="color:var(--orange); font-size:13px;">Key Points:</strong>
+            <ul style="margin-top:6px;">
+                {% for point in summary.key_points %}
+                <li style="font-size:13px; color:var(--text-secondary); margin-bottom:4px;">{{ point }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <a href="{% url 'download_transcript' session.session_code %}" class="btn btn-sikika">Download Transcript</a>
+        <a href="{% url 'session_analytics' session.session_code %}" class="btn btn-outline-sikika">Full Analytics</a>
+    </div>
+</div>
+
+<script>
+// ─── REPLAY AUDIO ENGINE (TTS for blind students) ──────────
+let replayAudioEnabled = true;
+let replayAudioRate = 1;
+let lastSpokenSegIdx = -1;
+
+const ReplayAudio = {
+    queue: [],
+    speaking: false,
+    speak(text, priority) {
+        if (!replayAudioEnabled) return;
+        if (priority === 'high') this.queue.unshift(text);
+        else this.queue.push(text);
+        this._process();
+    },
+    _process() {
+        if (this.speaking || this.queue.length === 0) return;
+        this.speaking = true;
+        const text = this.queue.shift();
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = replayAudioRate;
+        u.onend = () => { this.speaking = false; this._process(); };
+        u.onerror = () => { this.speaking = false; this._process(); };
+        speechSynthesis.speak(u);
+    },
+    stop() {
+        speechSynthesis.cancel();
+        this.queue = [];
+        this.speaking = false;
+    }
+};
+
+function toggleReplayAudio() {
+    replayAudioEnabled = !replayAudioEnabled;
+    const btn = document.getElementById('audioToggle');
+    btn.textContent = replayAudioEnabled ? 'Audio ON' : 'Audio OFF';
+    btn.classList.toggle('off', !replayAudioEnabled);
+    if (!replayAudioEnabled) ReplayAudio.stop();
+}
+
+document.getElementById('replayRate').addEventListener('input', function() {
+    replayAudioRate = parseFloat(this.value);
+    document.getElementById('replayRateLabel').textContent = replayAudioRate.toFixed(1) + '×';
+});
+
+// ─── REPLAY PLAYER ENGINE ─────────────────────────────────────
+const timeline = {{ timeline_json|safe }};
+const totalDuration = {{ duration }};
+const slider = document.getElementById('timelineSlider');
+const timeDisplay = document.getElementById('timeDisplay');
+const playBtn = document.getElementById('playBtn');
+const panel = document.getElementById('transcriptPanel');
+
+let playing = false;
+let currentTime = 0;
+let speed = 1;
+let interval = null;
+let lastActiveSegId = null;  // Track which segment is active to avoid redundant scrolls
+
+function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function updateDisplay() {
+    timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(totalDuration)}`;
+    slider.value = currentTime;
+
+    // Highlight active segment
+    const rows = panel.querySelectorAll('.seg-row');
+    let activeRow = null;
+    rows.forEach(row => {
+        const t = parseFloat(row.dataset.time);
+        row.classList.remove('active');
+        if (t <= currentTime) {
+            row.classList.add('played');
+            activeRow = row;
+        } else {
+            row.classList.remove('played');
+        }
+    });
+    if (activeRow) {
+        activeRow.classList.add('active');
+        activeRow.classList.remove('played');
+        // Only scroll when the active segment actually changes
+        if (activeRow.id !== lastActiveSegId) {
+            lastActiveSegId = activeRow.id;
+            activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Audio narration: speak each new active segment
+        const segIdx = Array.from(rows).indexOf(activeRow);
+        if (segIdx !== lastSpokenSegIdx && playing) {
+            lastSpokenSegIdx = segIdx;
+            const text = activeRow.querySelector('.seg-text')?.textContent;
+            if (text) ReplayAudio.speak(text, 'normal');
+        }
+    }
+}
+
+function togglePlay() {
+    if (playing) {
+        pause();
+    } else {
+        play();
+    }
+}
+
+function play() {
+    if (currentTime >= totalDuration) currentTime = 0;
+    playing = true;
+    playBtn.textContent = '⏸';
+    playBtn.setAttribute('aria-label', 'Pause');
+    interval = setInterval(() => {
+        currentTime += 0.1 * speed;
+        if (currentTime >= totalDuration) {
+            currentTime = totalDuration;
+            pause();
+        }
+        updateDisplay();
+    }, 100);
+}
+
+function pause() {
+    playing = false;
+    playBtn.textContent = '▶';
+    playBtn.setAttribute('aria-label', 'Play');
+    if (interval) { clearInterval(interval); interval = null; }
+    ReplayAudio.stop();
+}
+
+function seekTo(time) {
+    currentTime = time;
+    lastSpokenSegIdx = -1;  // Reset so audio re-narrates from this point
+    ReplayAudio.stop();
+    updateDisplay();
+}
+
+function setSpeed(s) {
+    speed = s;
+    document.querySelectorAll('.speed-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.includes(s + '×'));
+    });
+}
+
+slider.addEventListener('input', () => {
+    currentTime = parseFloat(slider.value);
+    updateDisplay();
+});
+
+// Keyboard controls
+document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    if (e.code === 'ArrowLeft') { currentTime = Math.max(0, currentTime - 5); lastSpokenSegIdx = -1; ReplayAudio.stop(); updateDisplay(); }
+    if (e.code === 'ArrowRight') { currentTime = Math.min(totalDuration, currentTime + 5); lastSpokenSegIdx = -1; ReplayAudio.stop(); updateDisplay(); }
+    if (e.key.toLowerCase() === 'a') { toggleReplayAudio(); }
+});
+
+// Delete note
+function deleteNote(noteId) {
+    if (!confirm('Delete this note?')) return;
+    fetch(`/api/notes/${noteId}/delete/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            const el = document.getElementById(`note-${noteId}`);
+            if (el) el.remove();
+        }
+    });
+}
+
+updateDisplay();
+</script>
+{% endblock %}

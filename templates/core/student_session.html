@@ -4,7 +4,7 @@
 {% block extra_css %}
 #captionBox {
     min-height: 50vh; max-height: 70vh; overflow-y: auto;
-    background: rgba(0,0,0,0.3); border-radius: 14px;
+    background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px;
     padding: 30px; font-size: 22px; line-height: 1.9;
     color: rgba(255,255,255,0.85);
 }
@@ -13,16 +13,14 @@
     border-bottom: 1px dashed rgba(232,168,56,0.4);
     cursor: help; position: relative;
 }
-/* Rich tooltip on click */
 .term-tooltip {
     position: fixed; z-index: 9999;
     background: var(--navy-light); border: 1px solid var(--orange);
-    border-radius: 10px; padding: 12px 16px; max-width: 300px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5); font-size: 14px;
+    border-radius: 8px; padding: 12px 16px; max-width: 300px;
+    font-size: 14px;
 }
 .term-tooltip .tt-term { color: var(--orange); font-weight: 600; font-size: 15px; }
 .term-tooltip .tt-def { color: var(--text-secondary); margin-top: 4px; }
-
 .interim-text { color: rgba(255,255,255,0.35); font-style: italic; }
 .live-indicator {
     display: inline-flex; align-items: center; gap: 8px;
@@ -36,13 +34,52 @@
     display: inline-flex; align-items: center; gap: 6px;
     padding: 4px 14px; border-radius: 100px; font-size: 12px; font-weight: 500;
 }
+/* ─── SIGN LANGUAGE INTERPRETER ENGINE ──────── */
 .sign-area {
-    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px;
-    min-height: 160px; background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06); border-radius: 14px;
-    margin-top: 16px; font-size: 56px; padding: 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
+    margin-top: 16px; padding: 20px;
 }
-/* Student controls bar */
+.sign-avatar-row {
+    display: flex; align-items: center; gap: 20px; margin-bottom: 16px;
+}
+.sign-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(232,168,56,0.1);
+    border: 2px solid var(--orange); display: flex; align-items: center;
+    justify-content: center; font-size: 36px; flex-shrink: 0;
+}
+.sign-status { font-size: 13px; color: var(--text-secondary); }
+.sign-status strong { color: var(--orange); }
+.fingerspell-strip {
+    display: flex; gap: 4px; flex-wrap: wrap; align-items: center;
+    min-height: 80px; padding: 12px; background: rgba(0,0,0,0.15);
+    border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px;
+}
+.fs-letter {
+    width: 52px; height: 64px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(232,168,56,0.06); border: 1px solid rgba(232,168,56,0.15);
+    border-radius: 8px; transition: all 0.3s; font-family: var(--font-heading);
+}
+.fs-letter.active {
+    background: rgba(232,168,56,0.2); border-color: var(--orange);
+    transform: scale(1.15);
+}
+.fs-letter.done { opacity: 0.4; }
+.fs-hand { font-size: 24px; line-height: 1; }
+.fs-char { font-size: 11px; color: var(--orange); font-weight: 700; margin-top: 2px; }
+.sign-desc-box {
+    background: rgba(56,212,232,0.03); border: 1px solid rgba(56,212,232,0.1);
+    border-radius: 8px; padding: 12px 16px; margin-top: 8px;
+}
+.sign-desc-box .sign-term { color: var(--cyan); font-weight: 600; font-size: 15px; }
+.sign-desc-box .sign-how { color: var(--text-secondary); font-size: 13px; margin-top: 4px; line-height: 1.6; }
+.sign-word-label {
+    text-align: center; font-size: 16px; font-weight: 600; color: var(--orange);
+    margin: 8px 0; letter-spacing: 2px; font-family: var(--font-heading);
+}
+.fs-space { width: 20px; height: 64px; }
 .student-controls {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     padding: 10px 0; margin-top: 8px;
@@ -53,11 +90,10 @@
     font-size: 13px; cursor: pointer; transition: all 0.2s;
 }
 .ctrl-btn:hover, .ctrl-btn.active { border-color: var(--orange); color: var(--orange); }
-/* AI intelligence bar */
 .ai-bar {
     display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-    padding: 8px 16px; background: rgba(56,212,232,0.04);
-    border: 1px solid rgba(56,212,232,0.1); border-radius: 10px;
+    padding: 8px 16px; background: rgba(56,212,232,0.03);
+    border: 1px solid rgba(56,212,232,0.1); border-radius: 8px;
     margin-bottom: 10px; font-size: 12px;
 }
 .ai-bar-item { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
@@ -72,28 +108,94 @@
     background: rgba(232,168,56,0.1); color: var(--orange);
     padding: 2px 8px; border-radius: 100px; font-weight: 600;
 }
-/* Font size classes for caption box */
 .caption-small #captionBox { font-size: 16px; line-height: 1.7; }
 .caption-medium #captionBox { font-size: 22px; line-height: 1.9; }
 .caption-large #captionBox { font-size: 28px; line-height: 2; }
 .caption-xlarge #captionBox { font-size: 36px; line-height: 2.1; }
-/* Slide display */
 .slide-display { text-align:center; margin-top:16px; }
-.slide-display img { max-width:100%; max-height:300px; border-radius:10px; border:1px solid var(--border); }
+.slide-display img { max-width:100%; max-height:300px; border-radius:8px; border:1px solid var(--border); }
 .slide-display p { font-size:13px; color:var(--text-secondary); margin-top:8px; }
-/* Reconnect banner */
 .reconnect-banner {
     position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
     background: rgba(232,64,64,0.9); color: #fff;
     padding: 8px 24px; border-radius: 8px; font-size: 13px; z-index: 999;
     display: none;
 }
+
+/* ─── Q&A PANEL ────────────────────────────── */
+.qa-panel {
+    background: rgba(56,212,232,0.02); border: 1px solid rgba(56,212,232,0.1);
+    border-radius: 8px; padding: 12px; margin-top: 12px;
+}
+.qa-panel h6 { font-size: 13px; font-weight: 600; color: var(--cyan); margin-bottom: 8px; }
+.qa-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.qa-input-row input {
+    flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: #fff; border-radius: 8px; padding: 8px 14px; font-size: 14px;
+}
+.qa-input-row input:focus { border-color: var(--cyan); outline: none; }
+.qa-input-row button {
+    background: rgba(56,212,232,0.15); color: var(--cyan);
+    border: 1px solid rgba(56,212,232,0.3); border-radius: 8px;
+    padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 13px;
+    white-space: nowrap;
+}
+.qa-input-row button:hover { background: rgba(56,212,232,0.25); }
+.qa-messages { max-height: 150px; overflow-y: auto; }
+.qa-msg {
+    padding: 6px 10px; margin-bottom: 4px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); font-size: 13px;
+    border-left: 3px solid var(--cyan);
+}
+.qa-msg .qa-author { color: var(--cyan); font-weight: 600; font-size: 11px; }
+.qa-msg .qa-time { color: var(--text-muted); font-size: 10px; float: right; }
+
+
+/* ─── BLIND MODE ENHANCEMENTS ──────────────── */
+.blind-help-panel {
+    background: rgba(56,232,112,0.03); border: 1px solid rgba(56,232,112,0.1);
+    border-radius: 8px; padding: 14px; margin-bottom: 10px;
+    font-size: 13px; line-height: 1.8;
+}
+.blind-help-panel kbd {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px; padding: 1px 6px; font-family: var(--font-heading);
+    font-size: 12px; color: var(--green);
+}
+.audio-status {
+    background: rgba(56,232,112,0.06); border: 1px solid rgba(56,232,112,0.15);
+    border-radius: 8px; padding: 6px 14px; font-size: 12px;
+    color: var(--green); display: inline-flex; align-items: center; gap: 6px;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* ─── SESSION ENDED OVERLAY ────────────────── */
+.session-ended-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10,22,40,0.95); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 20px;
+}
+.session-ended-overlay h2 { font-family: var(--font-heading); color: var(--orange); }
+.session-ended-overlay p { color: var(--text-secondary); font-size: 16px; }
 {% endblock %}
 
 {% block content %}
 <div class="reconnect-banner" id="reconnectBanner">Connection lost. Reconnecting...</div>
 
-<div class="container mt-4" id="sessionWrapper">
+<!-- Screen reader live announcements -->
+<div id="srAnnouncements" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+<div id="srLog" class="sr-only" aria-live="polite" aria-atomic="false"></div>
+
+<!-- Session Ended Overlay (hidden by default) -->
+<div class="session-ended-overlay" id="sessionEndedOverlay" style="display:none;" role="alert">
+    <h2>Session Ended</h2>
+    <p>The lecturer has ended this session.</p>
+    <a href="{% url 'session_transcript' session.session_code %}" class="btn btn-sikika">View Full Transcript & AI Summary</a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-sikika">← Back to Dashboard</a>
+</div>
+
+<div class="container mt-4" id="sessionWrapper" role="main">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div>
             <h4 style="font-family:var(--font-heading); font-weight:600; margin-bottom:4px;">{{ session.title }}</h4>
@@ -101,75 +203,123 @@
         </div>
         <div class="d-flex align-items-center gap-3">
             {% if mode == 'caption' %}
-            <span class="mode-indicator badge-caption">🔤 Smart Captions</span>
+            <span class="mode-indicator badge-caption" aria-label="Smart Captions mode">CC Smart Captions</span>
             {% elif mode == 'audio' %}
-            <span class="mode-indicator badge-audio">🔊 Audio Description</span>
+            <span class="mode-indicator badge-audio" aria-label="Audio Description mode active. Press H for keyboard shortcuts.">Audio Description</span>
             {% elif mode == 'sign' %}
-            <span class="mode-indicator badge-sign">🤟 Sign Language</span>
+            <span class="mode-indicator badge-sign" aria-label="Sign Language mode">ASL Sign Language</span>
             {% endif %}
-            <span class="live-indicator"><span class="live-dot"></span> LIVE</span>
+            <span class="live-indicator" aria-label="Session is live"><span class="live-dot"></span> LIVE</span>
+            <span id="attendeeCount" style="font-size:11px; color:var(--text-muted);" aria-live="polite"></span>
         </div>
     </div>
 
+    {% if mode == 'audio' %}
+    <!-- ═══════ BLIND-FIRST: HELP PANEL ═══════ -->
+    <div class="blind-help-panel" id="blindHelpPanel" role="region" aria-label="Keyboard shortcuts for audio mode">
+        <strong style="color:var(--green);">Audio Mode — Keyboard Shortcuts</strong><br>
+        <kbd>Space</kbd> Pause / Resume audio &nbsp;
+        <kbd>R</kbd> Replay last segment &nbsp;
+        <kbd>M</kbd> AI summary so far &nbsp;
+        <kbd>T</kbd> Hear detected terms &nbsp;
+        <kbd>S</kbd> Hear current slide &nbsp;
+        <kbd>H</kbd> Toggle this help &nbsp;
+        <kbd>Q</kbd> Focus question input &nbsp;
+        <kbd>↑↓</kbd> Adjust speech speed &nbsp;
+        <kbd>Esc</kbd> Leave session
+    </div>
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <span class="audio-status" id="audioStatus" role="status" aria-live="polite">Audio active — Speed: <span id="audioSpeedLabel">1.0x</span></span>
+    </div>
+    {% endif %}
+
     <!-- AI Intelligence Bar -->
-    <div class="ai-bar" id="aiBar">
-        <div class="ai-bar-item">🧠 <span style="font-size:10px; letter-spacing:1px; color:var(--cyan);">AI</span></div>
-        <div class="ai-bar-item">WPM: <span class="ai-bar-value" id="aiWPM">—</span></div>
+    <div class="ai-bar" id="aiBar" role="region" aria-label="AI lecture intelligence">
+        <div class="ai-bar-item"><span style="font-size:10px; letter-spacing:1px; color:var(--cyan); font-weight:600;">AI</span></div>
+        <div class="ai-bar-item">WPM: <span class="ai-bar-value" id="aiWPM" aria-label="Words per minute">—</span></div>
         <div class="ai-bar-item">
             Complexity:
-            <div class="complexity-mini">
+            <div class="complexity-mini" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="miniGaugeWrap">
                 <div class="complexity-mini-fill" id="miniGauge" style="width:0%; background:var(--green);"></div>
             </div>
-            <span class="ai-bar-value" id="aiComplexLabel">—</span>
+            <span class="ai-bar-value" id="aiComplexLabel" aria-label="Complexity level">—</span>
         </div>
-        <div class="ai-bar-item">Terms: <span class="smart-term-count" id="aiTermCount">0</span></div>
+        <div class="ai-bar-item">Terms: <span class="smart-term-count" id="aiTermCount" aria-label="Technical terms detected">0</span></div>
     </div>
 
     <!-- Caption area -->
-    <div id="captionBox" role="log" aria-live="polite" aria-label="Live captions">
+    <div id="captionBox" role="log" aria-live="polite" aria-label="Live captions" tabindex="0">
         <p style="color:var(--text-muted); font-style:italic;">Waiting for lecturer to start speaking...</p>
     </div>
     <div id="interimLine" class="interim-text" style="padding:10px 30px; min-height:30px;" aria-live="off"></div>
 
     {% if mode == 'sign' %}
-    <div class="sign-area" id="signArea" role="img" aria-label="Sign language indicators">🤟</div>
+    <!-- ═══════ SIGN LANGUAGE INTERPRETER PANEL ═══════ -->
+    <div class="sign-area" id="signArea" role="region" aria-label="Sign language interpreter">
+        <div class="sign-avatar-row">
+            <div class="sign-avatar" aria-hidden="true">🤟</div>
+            <div class="sign-status">
+                <strong>ASL Interpreter</strong><br>
+                <span id="signStatusText">Waiting for speech...</span>
+            </div>
+        </div>
+        <div class="sign-word-label" id="signWordLabel" aria-live="polite"></div>
+        <div class="fingerspell-strip" id="fingerspellStrip" role="img" aria-label="ASL fingerspelling">
+            <span style="color:var(--text-muted); font-size:13px;">Fingerspelling will appear here as the lecturer speaks...</span>
+        </div>
+        <div id="signDescriptions" role="log" aria-label="Sign language descriptions"></div>
+    </div>
     {% endif %}
 
     <!-- Slide display for students -->
-    <div class="slide-display" id="slideDisplay" style="display:none;">
+    <div class="slide-display" id="slideDisplay" style="display:none;" role="region" aria-label="Lecture slides">
         <p id="slideLabel" style="font-size:12px; color:var(--text-muted);">Slide</p>
         {% for slide in slides %}
-        <img src="{{ slide.image.url }}" id="slideImg{{ slide.slide_number }}" style="display:none;" alt="Slide {{ slide.slide_number }}">
+        <img src="{{ slide.image.url }}" id="slideImg{{ slide.slide_number }}" style="display:none;" alt="Slide {{ slide.slide_number }}{% if slide.ai_description %}: {{ slide.ai_description }}{% endif %}">
         {% endfor %}
         <p id="slideDescription" style="font-style:italic;"></p>
     </div>
 
+    <!-- ═══════ STUDENT Q&A PANEL ═══════ -->
+    <div class="qa-panel" id="qaPanel" role="region" aria-label="Student questions">
+        <h6>Q&A — Ask a Question <span style="font-size:11px; font-weight:400; color:var(--text-muted);">(visible to lecturer & classmates)</span></h6>
+        <div class="qa-input-row">
+            <input type="text" id="qaInput" placeholder="Type your question..." maxlength="500"
+                   aria-label="Type your question" autocomplete="off"
+                   onkeydown="if(event.key==='Enter'){sendQuestion(); event.stopPropagation();}">
+            <button onclick="sendQuestion()" aria-label="Send question">Ask</button>
+        </div>
+        <div class="qa-messages" id="qaMessages" role="log" aria-live="polite" aria-label="Questions from students">
+            <p style="color:var(--text-muted); font-size:12px; font-style:italic;" id="qaEmpty">No questions yet — be the first!</p>
+        </div>
+    </div>
+
     <!-- Student Controls -->
-    <div class="student-controls">
+    <div class="student-controls" role="toolbar" aria-label="Session controls">
         <!-- Font size -->
-        <button class="ctrl-btn" onclick="setCaptionSize('small')" title="Small text">A</button>
-        <button class="ctrl-btn active" onclick="setCaptionSize('medium')" title="Medium text">A+</button>
-        <button class="ctrl-btn" onclick="setCaptionSize('large')" title="Large text">A++</button>
-        <button class="ctrl-btn" onclick="setCaptionSize('xlarge')" title="Extra large text">A+++</button>
+        <button class="ctrl-btn" onclick="setCaptionSize('small')" title="Small text" aria-label="Small text">A</button>
+        <button class="ctrl-btn active" onclick="setCaptionSize('medium')" title="Medium text" aria-label="Medium text">A+</button>
+        <button class="ctrl-btn" onclick="setCaptionSize('large')" title="Large text" aria-label="Large text">A++</button>
+        <button class="ctrl-btn" onclick="setCaptionSize('xlarge')" title="Extra large text" aria-label="Extra large text">A+++</button>
         <span style="color:var(--border);">|</span>
-        <!-- Scroll control -->
-        <button class="ctrl-btn" id="btnScroll" onclick="toggleAutoScroll()" title="Auto-scroll">📜 Auto-scroll ON</button>
+        <button class="ctrl-btn" id="btnScroll" onclick="toggleAutoScroll()" title="Auto-scroll" aria-label="Toggle auto-scroll">Auto-scroll ON</button>
 
         {% if mode == 'audio' %}
         <span style="color:var(--border);">|</span>
-        <button id="btnToggleAudio" class="ctrl-btn active" onclick="toggleAudio()">🔊 Audio On</button>
-        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1" style="width:100px;" title="Speech speed">
+        <button id="btnToggleAudio" class="ctrl-btn active" onclick="toggleAudio()" aria-label="Toggle audio narration">Audio On</button>
+        <label for="speechRate" class="sr-only">Speech speed</label>
+        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1" style="width:100px;" title="Speech speed" aria-label="Speech speed">
         <span style="font-size:11px; color:var(--text-muted);">Speed</span>
         {% endif %}
 
         <span style="color:var(--border);">|</span>
-        <button class="ctrl-btn" onclick="downloadLiveTranscript()" title="Download transcript">📥 Save</button>
-        <a href="{% url 'dashboard' %}" class="ctrl-btn" style="text-decoration:none;">← Leave</a>
+        <button class="ctrl-btn" onclick="downloadLiveTranscript()" title="Download transcript" aria-label="Download live transcript">Save transcript</button>
+        <a href="{% url 'dashboard' %}" class="ctrl-btn" style="text-decoration:none;" aria-label="Leave session">← Leave</a>
     </div>
 </div>
 
 <!-- Term tooltip container -->
-<div class="term-tooltip" id="termTooltip" style="display:none;"></div>
+<div class="term-tooltip" id="termTooltip" style="display:none;" role="tooltip"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -178,28 +328,162 @@ const sessionCode = '{{ session.session_code }}';
 const mode = '{{ mode }}';
 const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 let ws;
-let audioEnabled = true;
+let audioEnabled = {{ mode|yesno:"true,false,false" }};  // Auto-enable for audio mode
 let started = false;
 let autoScroll = true;
 let GLOSSARY = {};
+let GLOSSARY_SIGNS = {};  // sign_description for glossary terms
 let allSegments = [];
+let lastSegmentText = '';
 
-// Load glossary from API
+// ═══════════════════════════════════════════════════════
+// AUDIO ENGINE — Smart TTS with Priority Queue
+// ═══════════════════════════════════════════════════════
+const AudioEngine = {
+    queue: [],
+    speaking: false,
+    paused: false,
+    rate: 1.0,
+    MAX_QUEUE: 4,       // Never let queue grow beyond this
+    _keepAlive: null,    // Chrome bug workaround interval
+
+    speak(text, priority, onDone) {
+        if (!('speechSynthesis' in window)) return;
+        // When paused, only allow high-priority — drop everything else
+        if (this.paused && priority !== 'high') return;
+
+        // If a new normal-priority item arrives, purge queued low-priority items
+        if (priority === 'normal') {
+            this.queue = this.queue.filter(item => item.priority !== 'low');
+        }
+        this.queue.push({text, priority, onDone});
+
+        // Cap queue size — drop oldest low/normal items to make room
+        while (this.queue.length > this.MAX_QUEUE) {
+            const dropIdx = this.queue.findIndex(item => item.priority === 'low');
+            if (dropIdx !== -1) { this.queue.splice(dropIdx, 1); continue; }
+            const dropNorm = this.queue.findIndex(item => item.priority === 'normal');
+            if (dropNorm !== -1) { this.queue.splice(dropNorm, 1); continue; }
+            this.queue.shift(); // Last resort: drop oldest
+        }
+
+        this._processQueue();
+    },
+
+    _processQueue() {
+        if (this.speaking || this.queue.length === 0) return;
+        // Sort: high priority first
+        this.queue.sort((a,b) => {
+            const p = {high: 0, normal: 1, low: 2};
+            return (p[a.priority]||1) - (p[b.priority]||1);
+        });
+        const item = this.queue.shift();
+        this.speaking = true;
+
+        const utterance = new SpeechSynthesisUtterance(item.text);
+        utterance.rate = this.rate;
+        utterance.pitch = 1;
+
+        // Safety timeout: if onend never fires (Chrome bug), force-continue after 12s
+        let safetyTimer = setTimeout(() => {
+            if (this.speaking) {
+                window.speechSynthesis.cancel();
+                this.speaking = false;
+                this._processQueue();
+            }
+        }, 12000);
+
+        utterance.onend = () => {
+            clearTimeout(safetyTimer);
+            this.speaking = false;
+            if (item.onDone) item.onDone();
+            this._processQueue();
+        };
+        utterance.onerror = () => {
+            clearTimeout(safetyTimer);
+            this.speaking = false;
+            this._processQueue();
+        };
+        window.speechSynthesis.speak(utterance);
+    },
+
+    // Chrome workaround: periodic pause/resume prevents the 15sec freeze bug
+    startKeepAlive() {
+        if (this._keepAlive) return;
+        this._keepAlive = setInterval(() => {
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                window.speechSynthesis.pause();
+                window.speechSynthesis.resume();
+            }
+        }, 8000);
+    },
+
+    pause() {
+        this.paused = true;
+        window.speechSynthesis.pause();
+        announceToScreen('Audio paused');
+    },
+
+    resume() {
+        this.paused = false;
+        window.speechSynthesis.resume();
+        this._processQueue();
+        announceToScreen('Audio resumed');
+    },
+
+    toggle() {
+        if (this.paused) this.resume(); else this.pause();
+    },
+
+    cancel() {
+        this.queue = [];
+        this.speaking = false;
+        window.speechSynthesis.cancel();
+    },
+
+    setRate(r) {
+        this.rate = r;
+        const label = document.getElementById('audioSpeedLabel');
+        if (label) label.textContent = r.toFixed(1) + 'x';
+    }
+};
+// Start Chrome keepalive immediately
+AudioEngine.startKeepAlive();
+
+// ═══════════════════════════════════════════════════════
+// SCREEN READER ANNOUNCEMENTS
+// ═══════════════════════════════════════════════════════
+function announceToScreen(text) {
+    const el = document.getElementById('srAnnouncements');
+    if (el) { el.textContent = ''; setTimeout(() => { el.textContent = text; }, 50); }
+}
+
+// ═══════════════════════════════════════════════════════
+// GLOSSARY
+// ═══════════════════════════════════════════════════════
+let glossaryReady = false;
 fetch('/api/glossary/')
     .then(r => r.json())
     .then(data => {
-        data.forEach(t => { GLOSSARY[t.term.toLowerCase()] = t.definition; });
+        data.forEach(t => {
+            GLOSSARY[t.term.toLowerCase()] = t.definition;
+            if (t.sign_description) GLOSSARY_SIGNS[t.term.toLowerCase()] = t.sign_description;
+        });
+        glossaryReady = true;
         console.log('Glossary loaded:', Object.keys(GLOSSARY).length, 'terms');
     })
-    .catch(() => console.log('Glossary API unavailable, using fallback'));
+    .catch(err => { console.warn('Glossary fetch failed:', err); });
 
-// WebSocket with auto-reconnect
+// ═══════════════════════════════════════════════════════
+// WEBSOCKET WITH AUTO-RECONNECT
+// ═══════════════════════════════════════════════════════
+let reconnectDelay = 1000;
 function connectWS() {
     ws = new WebSocket(wsProtocol + '//' + window.location.host + '/ws/lecture/' + sessionCode + '/');
 
     ws.onopen = () => {
-        console.log('Connected');
         document.getElementById('reconnectBanner').style.display = 'none';
+        reconnectDelay = 1000;  // Reset on success
     };
 
     ws.onmessage = (event) => {
@@ -210,43 +494,148 @@ function connectWS() {
                 document.getElementById('captionBox').innerHTML = '';
                 started = true;
             }
-
             if (data.is_final) {
                 allSegments.push(data.text);
-                // Use server-detected terms for smarter highlighting
-                appendCaption(data.text, data.detected_terms || []);
+                lastSegmentText = data.text;
+                appendCaption(data.text, data.detected_terms || [], data.emphasis || []);
                 document.getElementById('interimLine').textContent = '';
-                if (mode === 'audio' && audioEnabled) speakText(data.text);
-                // Update AI bar with server data
                 updateAIBar(data);
+
+                // ─── BLIND MODE: Smart audio narration ───
+                if (mode === 'audio' && audioEnabled) {
+                    // Speak the main caption text
+                    AudioEngine.speak(data.text, 'normal');
+
+                    // Announce at most ONE new term per segment (avoid flooding)
+                    if (data.detected_terms && data.detected_terms.length > 0) {
+                        for (const term of data.detected_terms) {
+                            if (!aiTermsAnnounced.has(term.toLowerCase())) {
+                                aiTermsAnnounced.add(term.toLowerCase());
+                                const def = GLOSSARY[term.toLowerCase()];
+                                if (def) {
+                                    AudioEngine.speak('New term: ' + term + '. ' + def, 'low');
+                                    break;  // Only one term per segment
+                                }
+                            }
+                        }
+                    }
+                    // Skip complex phrase announcements — too noisy
+                }
+
+                // Screen reader log
+                announceToScreen(data.text);
             } else {
                 document.getElementById('interimLine').textContent = data.text;
             }
         }
         else if (data.type === 'slide_change') {
-            showSlide(data.slide_number, data.description, data.total_slides);
+            showSlide(data.slide_number, data.description, data.total_slides, data.image_url || '');
         }
         else if (data.type === 'session_start') {
             if (!started) {
                 document.getElementById('captionBox').innerHTML = '';
                 started = true;
             }
+            if (mode === 'audio') AudioEngine.speak('The lecture has started.', 'high');
+            announceToScreen('The lecture has started.');
+        }
+        // ─── SESSION END ───
+        else if (data.type === 'session_end') {
+            if (mode === 'audio') {
+                AudioEngine.speak('The lecturer has ended this session. You can now review the transcript and AI summary.', 'high');
+            }
+            announceToScreen('Session ended. The lecturer has ended this session.');
+            document.getElementById('sessionEndedOverlay').style.display = 'flex';
+        }
+        // ─── STUDENT QUESTION ───
+        else if (data.type === 'student_question') {
+            showQuestion(data);
+            if (mode === 'audio') {
+                AudioEngine.speak('Question from ' + data.student + ': ' + data.text, 'normal');
+            }
+        }
+        // ─── ATTENDEE UPDATE ───
+        else if (data.type === 'attendee_update') {
+            const countEl = document.getElementById('attendeeCount');
+            if (countEl) countEl.textContent = data.total + ' students connected';
+            if (mode === 'audio' && !started) {
+                AudioEngine.speak(data.total + ' students in session.', 'low');
+            }
+        }
+        // ─── LIVE SUMMARY (for blind M key) ───
+        else if (data.type === 'live_summary') {
+            if (mode === 'audio') {
+                AudioEngine.speak('Summary so far: ' + data.summary, 'high');
+            }
+            announceToScreen('Summary: ' + data.summary);
+        }
+        // ─── LECTURER ALERT ───
+        else if (data.type === 'lecturer_alert') {
+            // If targeted, only show to the intended student
+            const myUsername = '{{ request.user.username }}';
+            if (!data.target || data.target === myUsername) {
+                showLecturerAlert(data.text, data.target);
+            }
         }
     };
 
     ws.onclose = () => {
         document.getElementById('reconnectBanner').style.display = 'block';
-        setTimeout(connectWS, 2000);
+        // Exponential backoff reconnect
+        setTimeout(connectWS, reconnectDelay);
+        reconnectDelay = Math.min(reconnectDelay * 1.5, 10000);
     };
 }
 connectWS();
 
-function appendCaption(text, serverDetectedTerms) {
+// ═══════════════════════════════════════════════════════
+// CAPTION RENDERING WITH EMPHASIS MARKERS
+// ═══════════════════════════════════════════════════════
+
+// ─── LECTURER ALERT DISPLAY ───
+function showLecturerAlert(text, target) {
+    // Visual alert banner
+    let banner = document.getElementById('lecturerAlertBanner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'lecturerAlertBanner';
+        banner.setAttribute('role', 'alert');
+        banner.setAttribute('aria-live', 'assertive');
+        banner.style.cssText = 'position:fixed; top:60px; left:50%; transform:translateX(-50%); ' +
+            'background:rgba(232,168,56,0.95); color:var(--navy); padding:12px 24px; border-radius:8px; ' +
+            'font-size:15px; font-weight:600; z-index:9999; max-width:500px; text-align:center;';
+        document.body.appendChild(banner);
+    }
+    const prefix = target ? 'Lecturer is asking you: ' : 'Lecturer says: ';
+    banner.textContent = prefix + text;
+    banner.style.display = 'block';
+
+    // Audio announcement for blind/audio mode
+    if (mode === 'audio' && audioEnabled) {
+        AudioEngine.speak(prefix + text, 'high');
+    }
+    announceToScreen(prefix + text);
+
+    // Also insert into caption box for reference
     const box = document.getElementById('captionBox');
+    const alertDiv = document.createElement('div');
+    alertDiv.style.cssText = 'background:rgba(232,168,56,0.1); border:1px solid rgba(232,168,56,0.3); border-radius:8px; padding:8px 14px; margin:8px 0; font-size:14px; color:var(--orange);';
+    alertDiv.textContent = prefix + text;
+    box.appendChild(alertDiv);
+    if (autoScroll) box.scrollTop = box.scrollHeight;
+
+    // Auto-dismiss visual banner after 8 seconds
+    setTimeout(() => { if (banner) banner.style.display = 'none'; }, 8000);
+}
+
+function appendCaption(text, serverDetectedTerms, emphasis) {
+    const box = document.getElementById('captionBox');
+    const wrapper = document.createElement('div');
+    wrapper.style.marginBottom = '4px';
+
     const span = document.createElement('span');
     let processed = text;
 
-    // Use server-detected terms first (more reliable), then fallback to client glossary
     const termsToHighlight = (serverDetectedTerms && serverDetectedTerms.length > 0)
         ? serverDetectedTerms
         : Object.keys(GLOSSARY);
@@ -255,18 +644,45 @@ function appendCaption(text, serverDetectedTerms) {
         const def = GLOSSARY[term.toLowerCase()] || 'Technical term detected by AI';
         const regex = new RegExp('\\b(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
         const safedef = def.replace(/"/g, '&quot;');
-        processed = processed.replace(regex, '<span class="term-highlight" data-term="' + term + '" data-def="' + safedef + '" onclick="showTermTooltip(event, this)">$1</span>');
+        processed = processed.replace(regex, '<span class="term-highlight" data-term="' + term + '" data-def="' + safedef + '" onclick="showTermTooltip(event, this)" role="button" tabindex="0" aria-label="Term: ' + term + '">$1</span>');
     }
 
     span.innerHTML = processed + ' ';
-    box.appendChild(span);
+    wrapper.appendChild(span);
+    box.appendChild(wrapper);
     if (autoScroll) box.scrollTop = box.scrollHeight;
 
     if (mode === 'sign') updateSignArea(text);
+
+    // ─── SIGN MODE: Show sign descriptions for detected terms ───
+    if (mode === 'sign' && serverDetectedTerms && serverDetectedTerms.length > 0) {
+        const descBox = document.getElementById('signDescriptions');
+        if (descBox) {
+            for (const term of serverDetectedTerms) {
+                const tl = term.toLowerCase();
+                const signDesc = GLOSSARY_SIGNS[tl];
+                if (signDesc) {
+                    const box = document.createElement('div');
+                    box.className = 'sign-desc-box';
+                    box.innerHTML = `<div class="sign-term">${term.toUpperCase()}</div>
+                        <div class="sign-how"><strong>Sign language:</strong> ${signDesc}</div>
+                        <div class="sign-how" style="margin-top:2px;"><strong>Definition:</strong> ${GLOSSARY[tl] || ''}</div>`;
+                    descBox.prepend(box);
+                    // Keep only 5 descriptions visible
+                    while (descBox.children.length > 5) descBox.removeChild(descBox.lastChild);
+                }
+            }
+        }
+    }
 }
 
-// AI Bar: Update with server-side intelligence data
+// ═══════════════════════════════════════════════════════
+// AI BAR
+// ═══════════════════════════════════════════════════════
 let aiTermsDetected = new Set();
+let aiTermsAnnounced = new Set();  // Track which terms have been spoken (for blind mode)
+let lastComplexityLabel = '';
+
 function updateAIBar(data) {
     if (data.wpm > 0) {
         document.getElementById('aiWPM').textContent = Math.round(data.wpm);
@@ -278,6 +694,14 @@ function updateAIBar(data) {
         else if (data.complexity < 70) gauge.style.background = 'var(--orange)';
         else gauge.style.background = '#e84040';
         document.getElementById('aiComplexLabel').textContent = data.complexity_label || '';
+
+        // Blind mode: announce complexity changes
+        if (mode === 'audio' && data.complexity_label && data.complexity_label !== lastComplexityLabel) {
+            if (data.complexity >= 70 && lastComplexityLabel !== '') {
+                AudioEngine.speak('Note: Lecture complexity is now ' + data.complexity_label + '.', 'low');
+            }
+            lastComplexityLabel = data.complexity_label;
+        }
     }
     if (data.detected_terms) {
         data.detected_terms.forEach(t => aiTermsDetected.add(t));
@@ -285,7 +709,9 @@ function updateAIBar(data) {
     }
 }
 
-// Rich term tooltip
+// ═══════════════════════════════════════════════════════
+// TERM TOOLTIP
+// ═══════════════════════════════════════════════════════
 function showTermTooltip(e, el) {
     e.stopPropagation();
     const tip = document.getElementById('termTooltip');
@@ -293,27 +719,52 @@ function showTermTooltip(e, el) {
     tip.style.display = 'block';
     tip.style.left = Math.min(e.clientX, window.innerWidth - 320) + 'px';
     tip.style.top = (e.clientY + 20) + 'px';
+    // Audio mode: speak the definition
+    if (mode === 'audio') {
+        AudioEngine.speak(el.dataset.term + ': ' + el.dataset.def, 'high');
+    }
 }
 document.addEventListener('click', () => { document.getElementById('termTooltip').style.display = 'none'; });
 
-// Audio mode — text-to-speech
-function speakText(text) {
-    if (!('speechSynthesis' in window)) return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = parseFloat(document.getElementById('speechRate')?.value || 1);
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
-}
-
+// ═══════════════════════════════════════════════════════
+// AUDIO CONTROLS
+// ═══════════════════════════════════════════════════════
 function toggleAudio() {
     audioEnabled = !audioEnabled;
     const btn = document.getElementById('btnToggleAudio');
-    btn.textContent = audioEnabled ? '🔊 Audio On' : '🔇 Audio Off';
-    btn.classList.toggle('active', audioEnabled);
-    if (!audioEnabled) window.speechSynthesis.cancel();
+    if (btn) {
+        btn.textContent = audioEnabled ? 'Audio On' : 'Audio Off';
+        btn.classList.toggle('active', audioEnabled);
+    }
+    if (!audioEnabled) AudioEngine.cancel();
+    announceToScreen(audioEnabled ? 'Audio narration enabled' : 'Audio narration disabled');
 }
 
-// Caption font size
+// ═══════════════════════════════════════════════════════
+// Q&A CHANNEL
+// ═══════════════════════════════════════════════════════
+function sendQuestion() {
+    const input = document.getElementById('qaInput');
+    const text = input.value.trim();
+    if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify({ type: 'student_question', text: text }));
+    input.value = '';
+    input.focus();
+}
+function showQuestion(data) {
+    const container = document.getElementById('qaMessages');
+    const empty = document.getElementById('qaEmpty');
+    if (empty) empty.remove();
+    const msg = document.createElement('div');
+    msg.className = 'qa-msg';
+    msg.innerHTML = '<span class="qa-author">' + data.student + '</span> <span class="qa-time">' + data.timestamp + '</span><br>' + data.text;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════
+// CAPTION SIZE + SCROLL + SIGN + SLIDE
+// ═══════════════════════════════════════════════════════
 function setCaptionSize(size) {
     const wrapper = document.getElementById('sessionWrapper');
     wrapper.classList.remove('caption-small', 'caption-medium', 'caption-large', 'caption-xlarge');
@@ -322,60 +773,357 @@ function setCaptionSize(size) {
     document.querySelectorAll('.student-controls .ctrl-btn').forEach(b => {
         if (['A', 'A+', 'A++', 'A+++'].includes(b.textContent)) b.classList.remove('active');
     });
-    event.target.classList.add('active');
+    if (event && event.target) event.target.classList.add('active');
 }
 
-// Auto-scroll toggle
 function toggleAutoScroll() {
     autoScroll = !autoScroll;
-    document.getElementById('btnScroll').textContent = autoScroll ? '📜 Auto-scroll ON' : '📜 Auto-scroll OFF';
+    document.getElementById('btnScroll').textContent = autoScroll ? 'Auto-scroll ON' : 'Auto-scroll OFF';
     document.getElementById('btnScroll').classList.toggle('active', autoScroll);
 }
 
-// Slide display
-function showSlide(num, desc, total) {
+function showSlide(num, desc, total, imageUrl) {
     const display = document.getElementById('slideDisplay');
     display.style.display = 'block';
     document.getElementById('slideLabel').textContent = 'Slide ' + num + ' of ' + total;
     document.querySelectorAll('[id^="slideImg"]').forEach(img => img.style.display = 'none');
-    const img = document.getElementById('slideImg' + num);
+    let img = document.getElementById('slideImg' + num);
+    // If no pre-rendered image exists, create one dynamically from the URL
+    if (!img && imageUrl) {
+        img = document.createElement('img');
+        img.id = 'slideImg' + num;
+        img.src = imageUrl;
+        img.alt = 'Slide ' + num + (desc ? ': ' + desc : '');
+        img.style.display = 'none';
+        display.insertBefore(img, document.getElementById('slideDescription'));
+    }
     if (img) img.style.display = 'inline-block';
     document.getElementById('slideDescription').textContent = desc || '';
 
-    if (mode === 'audio' && audioEnabled && desc) {
-        speakText('Slide ' + num + '. ' + desc);
+    if (mode === 'audio' && audioEnabled) {
+        const announcement = 'Slide ' + num + ' of ' + total + (desc ? '. ' + desc : '');
+        AudioEngine.speak(announcement, 'high');
     }
+    announceToScreen('Slide ' + num + ' of ' + total);
 }
 
-// Sign language
-const SIGN_MAP = {
-    'hello':'👋','yes':'👍','no':'👎','question':'❓','important':'❗',
-    'stop':'✋','good':'👍','think':'🤔','understand':'💡','learn':'📖',
-    'write':'✍️','read':'📖','listen':'👂','see':'👀','help':'🆘',
-    'thank':'🙏','please':'🤲','sorry':'😔','again':'🔄','more':'➕',
-    'explain':'💬','example':'📌','note':'📝','test':'📋','answer':'✅',
+// ═══════════════════════════════════════════════════════
+// ASL FINGERSPELLING ENGINE
+// ═══════════════════════════════════════════════════════
+const ASL_HAND = {
+    'a':'🤛','b':'🖐','c':'🤏','d':'☝️','e':'✊','f':'🤌','g':'🤙','h':'🤞',
+    'i':'🤙','j':'🤙','k':'✌️','l':'🤟','m':'✊','n':'✊','o':'👌','p':'👇',
+    'q':'👇','r':'🤞','s':'✊','t':'✊','u':'✌️','v':'✌️','w':'🤟','x':'🤙',
+    'y':'🤙','z':'☝️',
+    '0':'👌','1':'☝️','2':'✌️','3':'🤟','4':'🖐','5':'🖐',
+    '6':'🤙','7':'🤙','8':'🤙','9':'🤙',
+    ' ':' '
 };
 
+// Common ASL signs with descriptions of how to perform them
+const ASL_SIGNS = {
+    'hello': {emoji:'👋', desc:'Wave open hand side to side near your face'},
+    'thank': {emoji:'🤲', desc:'Touch chin with fingertips of flat hand, then move hand forward and down'},
+    'thanks': {emoji:'🤲', desc:'Touch chin with fingertips, move hand forward'},
+    'yes': {emoji:'✊', desc:'Make a fist and nod it up and down (like a nodding head)'},
+    'no': {emoji:'✌️', desc:'Snap index and middle finger together with thumb'},
+    'please': {emoji:'🤚', desc:'Rub flat hand in circle on chest'},
+    'sorry': {emoji:'✊', desc:'Make a fist, rub in circle on chest'},
+    'help': {emoji:'👍', desc:'Place fist on flat palm, raise both hands together'},
+    'understand': {emoji:'💡', desc:'Flick index finger up near forehead'},
+    'question': {emoji:'☝️', desc:'Draw a question mark in the air with index finger'},
+    'learn': {emoji:'📖', desc:'Take from flat palm to forehead (picking up knowledge)'},
+    'teach': {emoji:'🤲', desc:'Move both flat-O hands forward from temples'},
+    'important': {emoji:'❗', desc:'Both F-hands come together and rise from center'},
+    'again': {emoji:'🔄', desc:'Bent hand flips into flat palm'},
+    'stop': {emoji:'✋', desc:'Sharp chop of flat hand onto open palm'},
+    'think': {emoji:'🤔', desc:'Point index finger to side of forehead'},
+    'know': {emoji:'🧠', desc:'Tap fingertips to side of forehead'},
+    'good': {emoji:'👍', desc:'Touch chin with flat hand, move down to palm of other hand'},
+    'bad': {emoji:'👎', desc:'Touch chin, flip hand down palm-down'},
+    'more': {emoji:'🤲', desc:'Bring both flat-O hands together, fingertips touching'},
+    'less': {emoji:'👐', desc:'Both flat palms facing, move top hand downward'},
+    'example': {emoji:'📌', desc:'Flat hand against other palm, push both forward'},
+    'explain': {emoji:'💬', desc:'Both F-hands move forward alternately'},
+    'right': {emoji:'✅', desc:'One index finger drops onto other index finger'},
+    'wrong': {emoji:'❌', desc:'Tap chin with Y-hand knuckles'},
+    'what': {emoji:'❓', desc:'Drag index tip down across open palm'},
+    'why': {emoji:'❓', desc:'Touch forehead, pull away into Y-hand'},
+    'how': {emoji:'🤔', desc:'Both fists knuckle-to-knuckle, roll forward opening hands'},
+    'when': {emoji:'⏰', desc:'Circle index around other index, then land on tip'},
+    'where': {emoji:'👈', desc:'Shake index finger side to side'},
+    'who': {emoji:'👤', desc:'Circle index finger around pursed lips'},
+    'because': {emoji:'💭', desc:'Touch forehead with index, pull away closing into A-hand'},
+    'but': {emoji:'✌️', desc:'Cross both index fingers then pull apart'},
+    'also': {emoji:'➕', desc:'Both index fingers come together side by side'},
+    'first': {emoji:'1️⃣', desc:'Index finger strikes thumb of A-hand'},
+    'last': {emoji:'🔚', desc:'Pinky finger strikes pinky of I-hand'},
+    'many': {emoji:'🖐', desc:'Both S-hands flick open to 5-hands'},
+    'few': {emoji:'🤏', desc:'Open A-hand, count off fingers slowly'},
+    'student': {emoji:'🎓', desc:'Flat hand on palm lifts to forehead (LEARN + PERSON)'},
+    'teacher': {emoji:'👨‍🏫', desc:'Both flat-O hands move from temples forward (TEACH + PERSON)'},
+    'class': {emoji:'👥', desc:'Both C-hands circle forward from body'},
+    'test': {emoji:'📋', desc:'Both X-hands pull down opening to 5-hands'},
+    'answer': {emoji:'✅', desc:'Both index fingers at lips, then point forward'},
+    'read': {emoji:'📖', desc:'V-hand moves down open palm (eyes scanning)'},
+    'write': {emoji:'✍️', desc:'Pinch hand writes on flat palm'},
+    'book': {emoji:'📖', desc:'Both flat palms open like a book'},
+    'computer': {emoji:'💻', desc:'C-hand bounces up forearm'},
+    'information': {emoji:'ℹ️', desc:'Fingertips from forehead move down to open hand'},
+    'problem': {emoji:'😤', desc:'Both bent V-hands knuckles twist against each other'},
+    'practice': {emoji:'💪', desc:'A-hand brushes back and forth on other index finger'},
+    'try': {emoji:'💪', desc:'Both T-hands push forward together'},
+    'different': {emoji:'↔️', desc:'Cross index fingers then pull apart'},
+    'same': {emoji:'🟰', desc:'Both Y-hands tap together side by side'},
+    'change': {emoji:'🔄', desc:'Both A-hands pivot like turning a dial'},
+    'true': {emoji:'✅', desc:'Index finger moves forward from lips'},
+    'false': {emoji:'❌', desc:'Index finger slides across nose sideways'},
+    'new': {emoji:'✨', desc:'Cupped hand scoops across flat palm'},
+    'old': {emoji:'🧓', desc:'C-hand at chin pulls down into S-hand'},
+    'big': {emoji:'👐', desc:'Both L-hands move apart from center'},
+    'small': {emoji:'🤏', desc:'Both flat palms face each other close together'},
+    'start': {emoji:'▶️', desc:'Twist index finger between V-fingers of other hand'},
+    'finish': {emoji:'🏁', desc:'Both 5-hands flip from palms-in to palms-out'},
+    'science': {emoji:'🔬', desc:'Both A-hands alternately circle like pouring beakers'},
+    'research': {emoji:'🔍', desc:'R-hand sweeps across flat palm'},
+    'data': {emoji:'📊', desc:'D-hand taps across flat palm repeatedly'},
+    'network': {emoji:'🌐', desc:'Both 5-hands touch middle fingertips, twist, repeat'},
+    'technology': {emoji:'⚙️', desc:'Middle finger of 5-hand taps under chin, then flicks out'},
+};
+
+let signAnimTimer = null;
+let signQueue = [];
+let signAnimating = false;
+
 function updateSignArea(text) {
-    const area = document.getElementById('signArea');
-    if (!area) return;
-    const words = text.toLowerCase().split(/\s+/);
-    let signs = [];
-    for (const word of words) {
-        if (SIGN_MAP[word]) signs.push('<span title="' + word + '">' + SIGN_MAP[word] + '</span>');
+    const strip = document.getElementById('fingerspellStrip');
+    const descBox = document.getElementById('signDescriptions');
+    const statusEl = document.getElementById('signStatusText');
+    const wordLabel = document.getElementById('signWordLabel');
+    if (!strip) return;
+
+    statusEl.textContent = 'Interpreting...';
+
+    // Find words with known ASL signs or sign_description from glossary
+    const words = text.toLowerCase().replace(/[^a-z0-9\s'-]/g, '').split(/\s+/).filter(Boolean);
+
+    // Queue significant words for fingerspelling (skip common short words)
+    const SKIP = new Set(['a','an','the','is','are','was','were','be','been','am',
+        'to','of','in','on','at','for','and','or','it','its','this','that','with','as','by','from']);
+    const sigWords = words.filter(w => !SKIP.has(w) && w.length > 1);
+
+    // Show sign descriptions for detected glossary terms
+    const newDescs = [];
+    for (const w of words) {
+        // Check GLOSSARY_SIGNS from database first
+        if (GLOSSARY_SIGNS[w]) {
+            newDescs.push({term: w, how: GLOSSARY_SIGNS[w], source: 'glossary'});
+        }
+        // Then check ASL_SIGNS dictionary
+        else if (ASL_SIGNS[w]) {
+            newDescs.push({term: w, how: ASL_SIGNS[w].desc, emoji: ASL_SIGNS[w].emoji, source: 'asl'});
+        }
     }
-    if (signs.length > 0) area.innerHTML = signs.join(' ');
+    if (newDescs.length > 0 && descBox) {
+        descBox.innerHTML = '';
+        for (const d of newDescs.slice(0, 3)) {
+            const box = document.createElement('div');
+            box.className = 'sign-desc-box';
+            box.innerHTML = `<div class="sign-term">${d.emoji || '🤟'} ${d.term.toUpperCase()}</div>
+                <div class="sign-how"><strong>How to sign:</strong> ${d.how}</div>`;
+            descBox.appendChild(box);
+        }
+    }
+
+    // Fingerspell the most important word (longest content word or first detected term)
+    let targetWord = '';
+    // Prefer glossary terms
+    for (const w of words) {
+        if (GLOSSARY[w] || GLOSSARY_SIGNS[w]) { targetWord = w; break; }
+    }
+    // Fallback to longest significant word
+    if (!targetWord && sigWords.length > 0) {
+        targetWord = sigWords.reduce((a, b) => a.length >= b.length ? a : b);
+    }
+
+    if (targetWord) {
+        wordLabel.textContent = targetWord.toUpperCase();
+        animateFingerspell(targetWord);
+    }
 }
 
-// Download live transcript
+function animateFingerspell(word) {
+    const strip = document.getElementById('fingerspellStrip');
+    if (!strip) return;
+
+    // Clear previous animation
+    if (signAnimTimer) { clearInterval(signAnimTimer); signAnimTimer = null; }
+
+    // Build letter cards
+    strip.innerHTML = '';
+    const letters = word.split('');
+    for (let i = 0; i < letters.length; i++) {
+        const ch = letters[i];
+        if (ch === ' ') {
+            const spacer = document.createElement('div');
+            spacer.className = 'fs-space';
+            strip.appendChild(spacer);
+            continue;
+        }
+        const card = document.createElement('div');
+        card.className = 'fs-letter';
+        card.id = 'fs-' + i;
+        card.innerHTML = `<span class="fs-hand">${ASL_HAND[ch] || '❓'}</span><span class="fs-char">${ch.toUpperCase()}</span>`;
+        strip.appendChild(card);
+    }
+
+    // Animate: highlight each letter in sequence
+    let idx = 0;
+    const nonSpace = letters.filter(c => c !== ' ');
+    signAnimTimer = setInterval(() => {
+        // Remove previous active
+        strip.querySelectorAll('.fs-letter').forEach(el => {
+            el.classList.remove('active');
+            if (parseInt(el.id.split('-')[1]) < idx) el.classList.add('done');
+        });
+        const card = document.getElementById('fs-' + idx);
+        if (card) card.classList.add('active');
+        idx++;
+        if (idx > letters.length) {
+            clearInterval(signAnimTimer);
+            signAnimTimer = null;
+            document.getElementById('signStatusText').textContent = 'Ready for next phrase...';
+        }
+    }, 400);
+}
+
 function downloadLiveTranscript() {
     if (allSegments.length === 0) { alert('No transcript yet.'); return; }
-    const text = 'SIKIKA Live Transcript\\n{{ session.title }}\\n\\n' + allSegments.join('\\n');
+    const text = 'SIKIKA Live Transcript\n{{ session.title }}\n\n' + allSegments.join('\n');
     const blob = new Blob([text], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'transcript_{{ session.session_code }}.txt';
     a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD NAVIGATION (BLIND-FIRST)
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', function(e) {
+    // Don't capture keys when typing in inputs
+    if (e.target.id === 'qaInput') return;
+
+    const key = e.key.toLowerCase();
+
+    if (mode === 'audio') {
+        // SPACE: Pause/Resume audio
+        if (key === ' ' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+            e.preventDefault();
+            AudioEngine.toggle();
+        }
+        // R: Replay last segment
+        else if (key === 'r') {
+            e.preventDefault();
+            if (lastSegmentText) {
+                AudioEngine.speak('Replay: ' + lastSegmentText, 'high');
+            } else {
+                AudioEngine.speak('Nothing to replay yet.', 'high');
+            }
+        }
+        // M: Mid-session AI summary
+        else if (key === 'm') {
+            e.preventDefault();
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'request_summary' }));
+                AudioEngine.speak('Generating summary...', 'high');
+            }
+        }
+        // T: List detected terms
+        else if (key === 't') {
+            e.preventDefault();
+            if (aiTermsDetected.size === 0) {
+                AudioEngine.speak('No technical terms detected yet.', 'high');
+            } else {
+                const terms = Array.from(aiTermsDetected).join(', ');
+                AudioEngine.speak(aiTermsDetected.size + ' terms detected so far: ' + terms, 'high');
+            }
+        }
+        // S: Current slide info
+        else if (key === 's') {
+            e.preventDefault();
+            const slideLabel = document.getElementById('slideLabel')?.textContent;
+            const slideDesc = document.getElementById('slideDescription')?.textContent;
+            if (slideLabel && slideLabel !== 'Slide') {
+                AudioEngine.speak(slideLabel + (slideDesc ? '. ' + slideDesc : '. No description available.'), 'high');
+            } else {
+                AudioEngine.speak('No slides shown yet.', 'high');
+            }
+        }
+        // H: Toggle help panel
+        else if (key === 'h') {
+            e.preventDefault();
+            const panel = document.getElementById('blindHelpPanel');
+            if (panel) {
+                const visible = panel.style.display !== 'none';
+                panel.style.display = visible ? 'none' : 'block';
+                if (!visible) {
+                    AudioEngine.speak('Keyboard shortcuts. Space: pause or resume. R: replay last. M: AI summary. T: terms list. S: slide info. Q: ask a question. N: open notes. Up and Down arrows: adjust speed. Escape: leave session.', 'high');
+                }
+            }
+        }
+        // Q: Focus question input
+        else if (key === 'q') {
+            e.preventDefault();
+            document.getElementById('qaInput')?.focus();
+            AudioEngine.speak('Question input focused. Type your question and press Enter.', 'high');
+        }
+        // UP/DOWN: Adjust speed
+        else if (key === 'arrowup') {
+            e.preventDefault();
+            const slider = document.getElementById('speechRate');
+            if (slider) {
+                const newRate = Math.min(2, parseFloat(slider.value) + 0.1);
+                slider.value = newRate;
+                AudioEngine.setRate(newRate);
+                AudioEngine.speak('Speed ' + newRate.toFixed(1), 'high');
+            }
+        }
+        else if (key === 'arrowdown') {
+            e.preventDefault();
+            const slider = document.getElementById('speechRate');
+            if (slider) {
+                const newRate = Math.max(0.5, parseFloat(slider.value) - 0.1);
+                slider.value = newRate;
+                AudioEngine.setRate(newRate);
+                AudioEngine.speak('Speed ' + newRate.toFixed(1), 'high');
+            }
+        }
+        // ESC: Leave
+        else if (key === 'escape') {
+            AudioEngine.speak('Leaving session.', 'high');
+            setTimeout(() => { window.location.href = '{% url "dashboard" %}'; }, 800);
+        }
+    }
+
+    // Global shortcuts (all modes)
+    // F key: cycle font sizes
+    if (key === 'f' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        const sizes = ['small', 'medium', 'large', 'xlarge'];
+        const wrapper = document.getElementById('sessionWrapper');
+        let current = sizes.findIndex(s => wrapper.classList.contains('caption-' + s));
+        const next = (current + 1) % sizes.length;
+        setCaptionSize(sizes[next]);
+    }
+});
+
+// Speech rate slider change
+const speechRateSlider = document.getElementById('speechRate');
+if (speechRateSlider) {
+    speechRateSlider.addEventListener('input', function() {
+        AudioEngine.setRate(parseFloat(this.value));
+    });
 }
 
 // Restore saved caption size
@@ -392,5 +1140,12 @@ setInterval(() => {
         ws.send(JSON.stringify({ type: 'heartbeat' }));
     }
 }, 30000);
+
+// Welcome announcement for blind users
+if (mode === 'audio') {
+    setTimeout(() => {
+        AudioEngine.speak('Welcome to SIKIKA audio mode for ' + '{{ session.title }}' + '. Press H for keyboard shortcuts. Waiting for the lecturer to start speaking.', 'high');
+    }, 1000);
+}
 </script>
 {% endblock %}

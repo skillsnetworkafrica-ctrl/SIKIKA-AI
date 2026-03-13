@@ -1,5 +1,51 @@
 {% extends 'core/base.html' %}
 {% block title %}Dashboard — SIKIKA{% endblock %}
+
+{% block extra_css %}
+.session-card {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.session-card:hover { border-color: var(--border-hover); }
+.session-status {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    padding: 2px 10px; border-radius: 4px;
+}
+.status-live { background: rgba(56,232,112,0.12); color: var(--green); }
+.status-waiting { background: rgba(232,168,56,0.12); color: var(--orange); }
+.status-ended { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+.session-code {
+    font-family: var(--font-heading); font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; color: var(--orange); opacity: 0.8;
+}
+.session-stats {
+    display: flex; gap: 16px; font-size: 12px; color: var(--text-muted);
+    padding: 8px 0; border-top: 1px solid var(--border); margin-top: 12px;
+}
+.session-stats span { display: flex; align-items: center; gap: 4px; }
+.session-actions {
+    display: flex; gap: 6px; margin-top: auto; padding-top: 12px;
+}
+.action-btn {
+    flex: 1; text-align: center; padding: 7px 8px;
+    font-size: 12px; font-weight: 500; border-radius: 6px;
+    text-decoration: none; transition: all 0.15s;
+    border: 1px solid var(--border); color: var(--text-secondary);
+    background: transparent;
+}
+.action-btn:hover { border-color: var(--orange); color: var(--orange); }
+.action-btn.primary {
+    background: var(--orange); color: var(--navy);
+    border-color: var(--orange); font-weight: 600;
+}
+.action-btn.primary:hover { background: #d49730; }
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -11,40 +57,43 @@
     <div class="row g-3">
         {% for s in sessions %}
         <div class="col-md-4">
-            <div class="card-dark p-3">
-                <div class="d-flex justify-content-between align-items-start">
+            <div class="session-card">
+                <div class="d-flex justify-content-between align-items-start mb-1">
                     <div>
-                        <h5 style="font-weight:600; margin-bottom:4px;">{{ s.title }}</h5>
-                        <p class="text-muted mb-2" style="font-size:13px;">{{ s.course_code }}</p>
+                        <h5 style="font-weight:600; margin-bottom:2px; font-size:16px;">{{ s.title }}</h5>
+                        <p class="text-muted mb-0" style="font-size:12px;">{{ s.course_code }}</p>
                     </div>
                     {% if s.status == 'live' %}
-                    <span style="background:rgba(56,232,112,0.15); color:var(--green); padding:2px 10px; border-radius:100px; font-size:12px;">LIVE</span>
+                    <span class="session-status status-live">LIVE</span>
                     {% elif s.status == 'waiting' %}
-                    <span style="background:rgba(232,168,56,0.15); color:var(--orange); padding:2px 10px; border-radius:100px; font-size:12px;">WAITING</span>
+                    <span class="session-status status-waiting">WAITING</span>
                     {% else %}
-                    <span style="background:rgba(255,255,255,0.05); color:var(--text-muted); padding:2px 10px; border-radius:100px; font-size:12px;">Ended</span>
+                    <span class="session-status status-ended">Ended</span>
                     {% endif %}
                 </div>
-                <p style="font-family:var(--font-heading); font-size:20px; font-weight:700; letter-spacing:4px; color:var(--orange); margin:12px 0 8px 0;">{{ s.session_code }}</p>
 
-                <!-- Stats row -->
-                <div class="d-flex gap-3" style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
-                    <span>👥 {{ s.attendee_count }} students</span>
-                    <span>📝 {{ s.segment_count }} segments</span>
+                <div class="session-code mt-2">{{ s.session_code }}</div>
+
+                <div class="session-stats">
+                    <span>{{ s.attendee_count }} students</span>
+                    <span>{{ s.segment_count }} segments</span>
                     {% if s.duration_minutes %}
-                    <span>🕐 {{ s.duration_minutes }}min</span>
+                    <span>{{ s.duration_minutes }}min</span>
                     {% endif %}
                 </div>
 
-                <p class="text-muted" style="font-size:12px;">{{ s.created_at|date:"M d, Y H:i" }}</p>
+                <p class="text-muted mb-0" style="font-size:11px; margin-top:4px;">{{ s.created_at|date:"M d, Y H:i" }}</p>
 
                 {% if s.status == 'live' or s.status == 'waiting' %}
-                <a href="{% url 'lecturer_session' s.session_code %}" class="btn btn-sikika btn-sm w-100 mt-2">Open Session</a>
+                <div class="session-actions">
+                    <a href="{% url 'lecturer_session' s.session_code %}" class="action-btn primary">Open Session</a>
+                </div>
                 {% else %}
-                <div class="d-flex gap-2 mt-2">
-                    <a href="{% url 'session_summary' s.session_code %}" class="btn btn-sikika btn-sm flex-fill">🧠 AI Summary</a>
-                    <a href="{% url 'session_analytics' s.session_code %}" class="btn btn-outline-sikika btn-sm" title="Analytics">📊</a>
-                    <a href="{% url 'session_quiz' s.session_code %}" class="btn btn-outline-sikika btn-sm" title="Quiz">🧪</a>
+                <div class="session-actions">
+                    <a href="{% url 'session_summary' s.session_code %}" class="action-btn primary">Summary</a>
+                    <a href="{% url 'session_replay' s.session_code %}" class="action-btn" title="Replay">Replay</a>
+                    <a href="{% url 'session_analytics' s.session_code %}" class="action-btn" title="Analytics">Analytics</a>
+                    <a href="{% url 'session_quiz' s.session_code %}" class="action-btn" title="Quiz">Quiz</a>
                 </div>
                 {% endif %}
             </div>
@@ -52,9 +101,8 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="card-dark p-5 text-center">
-        <p style="font-size:48px; margin-bottom:16px;">🎙️</p>
-        <p style="color:var(--text-secondary);">No sessions yet. Create your first one!</p>
+    <div class="session-card text-center" style="padding:48px 20px;">
+        <p style="font-size:16px; color:var(--text-secondary); margin:0;">No sessions yet. Create your first one!</p>
     </div>
     {% endif %}
 </div>

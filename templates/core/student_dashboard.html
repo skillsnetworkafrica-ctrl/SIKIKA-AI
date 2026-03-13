@@ -1,11 +1,50 @@
 {% extends 'core/base.html' %}
 {% block title %}Dashboard — SIKIKA{% endblock %}
+
+{% block extra_css %}
+.session-card {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.session-card:hover { border-color: var(--border-hover); }
+.session-status {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    padding: 2px 10px; border-radius: 4px;
+}
+.status-live { background: rgba(56,232,112,0.12); color: var(--green); }
+.status-ended { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+.mode-tag {
+    font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 4px;
+}
+.session-actions {
+    display: flex; gap: 6px; margin-top: auto; padding-top: 12px;
+}
+.action-btn {
+    flex: 1; text-align: center; padding: 7px 8px;
+    font-size: 12px; font-weight: 500; border-radius: 6px;
+    text-decoration: none; transition: all 0.15s;
+    border: 1px solid var(--border); color: var(--text-secondary);
+    background: transparent;
+}
+.action-btn:hover { border-color: var(--orange); color: var(--orange); }
+.action-btn.primary {
+    background: var(--orange); color: var(--navy);
+    border-color: var(--orange); font-weight: 600;
+}
+.action-btn.primary:hover { background: #d49730; }
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="font-family:var(--font-heading); font-weight:600;">Your Lectures</h2>
         <div class="d-flex gap-2">
-            <a href="{% url 'accessibility_settings' %}" class="btn btn-outline-sikika btn-sm">♿ Settings</a>
+            <a href="{% url 'accessibility_settings' %}" class="btn btn-outline-sikika btn-sm">Settings</a>
             <a href="{% url 'join_session' %}" class="btn btn-sikika">Join Session</a>
         </div>
     </div>
@@ -14,22 +53,34 @@
     <div class="row g-3">
         {% for a in attendances %}
         <div class="col-md-4">
-            <div class="card-dark p-3">
-                <h5 style="font-weight:600; margin-bottom:4px;">{{ a.session.title }}</h5>
-                <p class="text-muted mb-2" style="font-size:13px;">{{ a.session.course_code }}</p>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge-mode badge-{{ a.mode }}">{{ a.get_mode_display }}</span>
+            <div class="session-card">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div>
+                        <h5 style="font-weight:600; margin-bottom:2px; font-size:16px;">{{ a.session.title }}</h5>
+                        <p class="text-muted mb-0" style="font-size:12px;">{{ a.session.course_code }}</p>
+                    </div>
                     {% if a.session.status == 'live' or a.session.status == 'waiting' %}
-                    <span style="background:rgba(56,232,112,0.15); color:var(--green); padding:2px 8px; border-radius:100px; font-size:11px;">LIVE</span>
+                    <span class="session-status status-live">LIVE</span>
+                    {% else %}
+                    <span class="session-status status-ended">Ended</span>
                     {% endif %}
                 </div>
-                <p class="text-muted mt-1" style="font-size:12px;">Joined {{ a.joined_at|date:"M d, H:i" }}</p>
+
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <span class="mode-tag badge-mode badge-{{ a.mode }}">{{ a.get_mode_display }}</span>
+                </div>
+
+                <p class="text-muted mb-0" style="font-size:11px; margin-top:10px; border-top:1px solid var(--border); padding-top:8px;">Joined {{ a.joined_at|date:"M d, H:i" }}</p>
+
                 {% if a.session.status == 'live' or a.session.status == 'waiting' %}
-                <a href="{% url 'student_session' a.session.session_code a.mode %}" class="btn btn-sikika btn-sm w-100 mt-2">Rejoin</a>
+                <div class="session-actions">
+                    <a href="{% url 'student_session' a.session.session_code a.mode %}" class="action-btn primary">Rejoin</a>
+                </div>
                 {% elif a.session.status == 'ended' %}
-                <div class="d-flex gap-2 mt-2">
-                    <a href="{% url 'session_summary' a.session.session_code %}" class="btn btn-sikika btn-sm flex-fill">🧠 Summary</a>
-                    <a href="{% url 'session_quiz' a.session.session_code %}" class="btn btn-outline-sikika btn-sm" title="Take Quiz">🧪</a>
+                <div class="session-actions">
+                    <a href="{% url 'session_summary' a.session.session_code %}" class="action-btn primary">Summary</a>
+                    <a href="{% url 'session_replay' a.session.session_code %}" class="action-btn" title="Replay Session">Replay</a>
+                    <a href="{% url 'session_quiz' a.session.session_code %}" class="action-btn" title="Take Quiz">Quiz</a>
                 </div>
                 {% endif %}
             </div>
@@ -37,9 +88,8 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="card-dark p-5 text-center">
-        <p style="font-size:48px; margin-bottom:16px;">📱</p>
-        <p style="color:var(--text-secondary);">No sessions joined yet. Enter a session code to start!</p>
+    <div class="session-card text-center" style="padding:48px 20px;">
+        <p style="font-size:16px; color:var(--text-secondary); margin:0;">No sessions joined yet. Enter a session code to start!</p>
     </div>
     {% endif %}
 </div>

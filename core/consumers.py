@@ -2,7 +2,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import LectureSession, TranscriptSegment, SessionAttendance, GlossaryTerm
-from .ai_services import detect_technical_terms, complexity_score, complexity_label, tokenize_words
+from .ai_services import detect_technical_terms, complexity_score, complexity_label, tokenize_words, detect_emphasis, generate_live_summary, detect_complex_phrases
 from django.utils import timezone
 
 
@@ -13,6 +13,7 @@ class LectureConsumer(AsyncWebsocketConsumer):
         self.user = self.scope.get('user')
         self.cumulative_words = 0
         self.session_start_time = None
+        self.all_segments_text = []  # Store for mid-session summary
 
         session_exists = await self.check_session_exists()
         if not session_exists:
@@ -24,6 +25,10 @@ class LectureConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
+
+        # Reset left_at for reconnecting students
+        if self.user and self.user.is_authenticated:
+            await self.mark_student_rejoined()
 
         # Broadcast updated attendee count
         counts = await self.get_attendee_counts()
@@ -62,7 +67,11 @@ class LectureConsumer(AsyncWebsocketConsumer):
             pass
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.send(text_data=json.dumps({'type': 'error', 'message': 'Invalid JSON'}))
+            return
         msg_type = data.get('type', '')
 
         if msg_type == 'transcript':
@@ -73,6 +82,12 @@ class LectureConsumer(AsyncWebsocketConsumer):
                 # AI: Detect technical terms in this segment
                 detected = detect_technical_terms(text, self.glossary_terms)
                 has_terms = len(detected) > 0
+
+                # AI: Detect emphasis/importance markers
+                emphasis = detect_emphasis(text)
+
+                # AI: Detect complex academic phrases
+                complex_phrases = detect_complex_phrases(text)
 
                 # AI: Track cumulative WPM
                 words = tokenize_words(text)
@@ -87,6 +102,9 @@ class LectureConsumer(AsyncWebsocketConsumer):
                 seg_complexity = complexity_score(text)
                 seg_label = complexity_label(seg_complexity)
 
+                # Store for mid-session summaries
+                self.all_segments_text.append(text)
+
                 await self.save_segment(text, has_terms)
 
                 # Send enriched transcript with AI data
@@ -100,6 +118,8 @@ class LectureConsumer(AsyncWebsocketConsumer):
                         'complexity': seg_complexity,
                         'complexity_label': seg_label,
                         'wpm': wpm,
+                        'emphasis': emphasis,
+                        'complex_phrases': complex_phrases,
                     }
                 )
             else:
@@ -120,6 +140,7 @@ class LectureConsumer(AsyncWebsocketConsumer):
             slide_number = data.get('slide_number', 0)
             description = data.get('description', '')
             total_slides = data.get('total_slides', 0)
+            image_url = data.get('image_url', '')
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -127,6 +148,7 @@ class LectureConsumer(AsyncWebsocketConsumer):
                     'slide_number': slide_number,
                     'description': description,
                     'total_slides': total_slides,
+                    'image_url': image_url,
                 }
             )
 
@@ -142,6 +164,53 @@ class LectureConsumer(AsyncWebsocketConsumer):
         elif msg_type == 'heartbeat':
             await self.send(text_data=json.dumps({'type': 'heartbeat_ack'}))
 
+        # ─── STUDENT QUESTION CHANNEL ─────────────────────────
+        elif msg_type == 'student_question':
+            question_text = data.get('text', '').strip()
+            if question_text and self.user and self.user.is_authenticated:
+                username = self.user.username
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'broadcast_question',
+                        'text': question_text,
+                        'student': username,
+                        'timestamp': timezone.now().strftime('%H:%M'),
+                    }
+                )
+
+        # ─── SESSION END (Lecturer ends session) ──────────────
+        elif msg_type == 'session_end':
+            await self.end_session_db()
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {'type': 'broadcast_session_end'}
+            )
+
+        # ─── LECTURER ALERT / TAG A STUDENT ───────────────────
+        elif msg_type == 'lecturer_alert':
+            alert_text = data.get('text', '').strip()
+            target_student = data.get('target', '')  # username or empty for all
+            if alert_text:
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'broadcast_lecturer_alert',
+                        'text': alert_text,
+                        'target': target_student,
+                        'timestamp': timezone.now().strftime('%H:%M'),
+                    }
+                )
+
+        # ─── MID-SESSION SUMMARY REQUEST (Blind students) ─────
+        elif msg_type == 'request_summary':
+            summary = generate_live_summary(self.all_segments_text, max_sentences=3)
+            await self.send(text_data=json.dumps({
+                'type': 'live_summary',
+                'summary': summary,
+                'segment_count': len(self.all_segments_text),
+            }))
+
     async def broadcast_transcript(self, event):
         await self.send(text_data=json.dumps({
             'type': 'transcript',
@@ -151,6 +220,8 @@ class LectureConsumer(AsyncWebsocketConsumer):
             'complexity': event.get('complexity', 0),
             'complexity_label': event.get('complexity_label', ''),
             'wpm': event.get('wpm', 0),
+            'emphasis': event.get('emphasis', []),
+            'complex_phrases': event.get('complex_phrases', []),
         }))
 
     async def broadcast_slide(self, event):
@@ -159,6 +230,7 @@ class LectureConsumer(AsyncWebsocketConsumer):
             'slide_number': event['slide_number'],
             'description': event['description'],
             'total_slides': event['total_slides'],
+            'image_url': event.get('image_url', ''),
         }))
 
     async def attendee_update(self, event):
@@ -172,6 +244,28 @@ class LectureConsumer(AsyncWebsocketConsumer):
 
     async def broadcast_session_start(self, event):
         await self.send(text_data=json.dumps({'type': 'session_start'}))
+
+    async def broadcast_question(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'student_question',
+            'text': event['text'],
+            'student': event['student'],
+            'timestamp': event['timestamp'],
+        }))
+
+    async def broadcast_session_end(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'session_end',
+            'message': 'The lecturer has ended this session.',
+        }))
+
+    async def broadcast_lecturer_alert(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'lecturer_alert',
+            'text': event['text'],
+            'target': event['target'],
+            'timestamp': event['timestamp'],
+        }))
 
     @database_sync_to_async
     def check_session_exists(self):
@@ -225,5 +319,26 @@ class LectureConsumer(AsyncWebsocketConsumer):
             pass
 
     @database_sync_to_async
+    def mark_student_rejoined(self):
+        """Reset left_at when a student's WebSocket reconnects."""
+        try:
+            SessionAttendance.objects.filter(
+                session__session_code=self.session_code,
+                student=self.user,
+            ).update(left_at=None)
+        except Exception:
+            pass
+
+    @database_sync_to_async
     def load_glossary_terms(self):
         return list(GlossaryTerm.objects.values_list('term', flat=True))
+
+    @database_sync_to_async
+    def end_session_db(self):
+        try:
+            session = LectureSession.objects.get(session_code=self.session_code)
+            session.status = 'ended'
+            session.ended_at = timezone.now()
+            session.save()
+        except LectureSession.DoesNotExist:
+            pass

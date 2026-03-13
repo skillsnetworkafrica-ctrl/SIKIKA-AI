@@ -7,19 +7,19 @@
 .mic-status.active { background: #e84040; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 .timer { font-family: var(--font-heading); font-size: 24px; font-weight: 600; color: var(--text-secondary); letter-spacing: 2px; }
-.slide-panel { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px; margin-top: 16px; }
+.slide-panel { background: rgba(0,0,0,0.15); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 16px; }
 .slide-thumb { width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 2px solid transparent; cursor: pointer; }
 .slide-thumb.active { border-color: var(--orange); }
 .attendee-breakdown { display: flex; gap: 16px; font-size: 13px; }
 .attendee-breakdown span { display: flex; align-items: center; gap: 4px; }
 /* AI Intelligence Panel */
 .ai-panel {
-    background: linear-gradient(135deg, rgba(232,168,56,0.05) 0%, rgba(56,212,232,0.03) 100%);
-    border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); border-radius: 8px; padding: 16px;
 }
 .ai-metric {
     text-align: center; padding: 12px 8px;
-    background: rgba(0,0,0,0.15); border-radius: 10px;
+    background: rgba(0,0,0,0.1); border: 1px solid var(--border); border-radius: 8px;
 }
 .ai-metric-value { font-size: 22px; font-weight: 700; font-family: var(--font-heading); color: var(--orange); }
 .ai-metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 2px; }
@@ -39,6 +39,38 @@
     color: var(--cyan); padding: 2px 10px; border-radius: 100px;
     background: rgba(56,212,232,0.1); border: 1px solid rgba(56,212,232,0.2);
 }
+
+
+/* ─── Q&A PANEL (LECTURER VIEW) ──────── */
+.qa-lecturer-panel {
+    background: rgba(56,212,232,0.02); border: 1px solid rgba(56,212,232,0.1);
+    border-radius: 8px; padding: 14px; margin-bottom: 12px;
+}
+.qa-lecturer-panel h6 {
+    font-size: 13px; font-weight: 600; color: var(--cyan);
+    margin-bottom: 8px;
+}
+.qa-lecturer-msg {
+    padding: 8px 12px; margin-bottom: 6px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); font-size: 14px;
+    border-left: 3px solid var(--cyan);
+    animation: slideInQ 0.3s ease;
+}
+@keyframes slideInQ { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.qa-lecturer-msg .qa-student-name { color: var(--cyan); font-weight: 600; font-size: 12px; }
+.qa-lecturer-msg .qa-timestamp { color: var(--text-muted); font-size: 10px; float: right; }
+.qa-badge-count {
+    background: var(--cyan); color: var(--navy); font-size: 11px;
+    font-weight: 700; border-radius: 50%; min-width: 20px; height: 20px;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: 6px;
+}
+.ctrl-btn-lec {
+    background: rgba(232,168,56,0.08); border: 1px solid rgba(232,168,56,0.2);
+    color: var(--orange); border-radius: 6px; padding: 4px 12px; cursor: pointer;
+    font-size: 12px; transition: all 0.2s;
+}
+.ctrl-btn-lec:hover { background: rgba(232,168,56,0.2); }
 {% endblock %}
 
 {% block content %}
@@ -65,9 +97,9 @@
         <div class="d-flex align-items-center gap-3">
             <div class="attendee-breakdown" id="attendeeBreakdown">
                 <span title="Total students"><strong id="totalCount">{{ attendees.count }}</strong> students</span>
-                <span class="badge-mode badge-caption">🔤 <span id="captionCount">0</span></span>
-                <span class="badge-mode badge-audio">🔊 <span id="audioCount">0</span></span>
-                <span class="badge-mode badge-sign">🤟 <span id="signCount">0</span></span>
+                <span class="badge-mode badge-caption">CC <span id="captionCount">0</span></span>
+                <span class="badge-mode badge-audio">Aud <span id="audioCount">0</span></span>
+                <span class="badge-mode badge-sign">ASL <span id="signCount">0</span></span>
             </div>
         </div>
     </div>
@@ -75,7 +107,7 @@
     <!-- AI Intelligence Panel -->
     <div class="ai-panel mb-3">
         <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="ai-badge-live">🧠 AI INSIGHTS — LIVE</span>
+            <span class="ai-badge-live">AI INSIGHTS — LIVE</span>
             <span style="font-size:11px; color:var(--text-muted);" id="aiStatus">Waiting for speech...</span>
         </div>
         <div class="row g-2 mb-2">
@@ -114,22 +146,54 @@
         </div>
     </div>
 
+    <!-- ═══════ STUDENT Q&A PANEL (LECTURER VIEW) ═══════ -->
+    <div class="qa-lecturer-panel" id="qaLecturerPanel">
+        <h6>Student Questions <span class="qa-badge-count" id="qaBadge" style="display:none;">0</span></h6>
+        <div id="qaLecturerMessages" style="max-height: 200px; overflow-y: auto;">
+            <p style="color:var(--text-muted); font-size:12px; font-style:italic;" id="qaLecturerEmpty">No questions from students yet.</p>
+        </div>
+    </div>
+
+    <!-- ═══════ ALERT / TAG A STUDENT ═══════ -->
+    <div class="qa-lecturer-panel" id="alertPanel" style="border-color: rgba(232,168,56,0.2); background: rgba(232,168,56,0.03);">
+        <h6 style="color:var(--orange);">Send Alert to Students</h6>
+        <div style="display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+            <select id="alertTarget" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; border-radius:8px; padding:6px 12px; font-size:13px; min-width:160px;">
+                <option value="">All Students</option>
+                {% for att in attendees %}
+                <option value="{{ att.student.username }}">{{ att.student.username }} ({{ att.mode }})</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="alertInput" placeholder="Type alert message..." maxlength="300"
+                   style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; border-radius:8px; padding:6px 14px; font-size:14px; min-width:200px;"
+                   onkeydown="if(event.key==='Enter') sendLecturerAlert();">
+            <button onclick="sendLecturerAlert()" style="background:rgba(232,168,56,0.15); color:var(--orange); border:1px solid rgba(232,168,56,0.3); border-radius:8px; padding:6px 16px; cursor:pointer; font-weight:600; font-size:13px; white-space:nowrap;">Send Alert</button>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted);">Quick actions:</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+            <button class="ctrl-btn-lec" onclick="quickAlert('Please pay attention')">Attention</button>
+            <button class="ctrl-btn-lec" onclick="quickAlert('Any questions so far?')">Any Questions?</button>
+            <button class="ctrl-btn-lec" onclick="quickAlert('Let\\'s take a short break')">Break</button>
+            <button class="ctrl-btn-lec" onclick="quickAlert('Ready to continue?')">Ready?</button>
+        </div>
+    </div>
+
     <!-- Controls -->
     <div class="card-dark p-4 mb-3">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <div class="d-flex gap-2">
-                <button id="btnStart" class="btn btn-sikika" onclick="startCapture()" aria-label="Start speaking">🎙️ Start Speaking</button>
-                <button id="btnStop" class="btn btn-outline-sikika" onclick="stopCapture()" style="display:none;" aria-label="Stop speaking">⏹ Stop</button>
+                <button id="btnStart" class="btn btn-sikika" onclick="startCapture()" aria-label="Start speaking">Start Speaking</button>
+                <button id="btnStop" class="btn btn-outline-sikika" onclick="stopCapture()" style="display:none;" aria-label="Stop speaking">Stop</button>
             </div>
             <div>
                 {% if session.status != 'ended' %}
-                <a href="{% url 'end_session' session.session_code %}" class="btn btn-sm" style="background:rgba(232,64,64,0.15); color:#e84040; border:1px solid rgba(232,64,64,0.2);" onclick="return confirm('End this session? Students will be disconnected.')">End Session</a>
+                <a href="{% url 'end_session' session.session_code %}" class="btn btn-sm" style="background:rgba(232,64,64,0.15); color:#e84040; border:1px solid rgba(232,64,64,0.2);" onclick="if(!confirm('End this session? Students will be notified.')) return false; endSessionViaWS();">End Session</a>
                 {% endif %}
             </div>
         </div>
 
         <!-- Live Transcript -->
-        <div id="liveTranscript" role="log" aria-live="polite" aria-label="Live transcript" style="min-height:200px; max-height:400px; overflow-y:auto; background:rgba(0,0,0,0.2); border-radius:10px; padding:20px; font-size:18px; line-height:1.8; color:rgba(255,255,255,0.8);">
+        <div id="liveTranscript" role="log" aria-live="polite" aria-label="Live transcript" style="min-height:200px; max-height:400px; overflow-y:auto; background:rgba(0,0,0,0.15); border:1px solid var(--border); border-radius:8px; padding:20px; font-size:18px; line-height:1.8; color:rgba(255,255,255,0.8);">
             <p style="color:var(--text-muted); font-style:italic;">Click "Start Speaking" to begin the live session...</p>
         </div>
         <div id="currentLine" style="margin-top:12px; font-size:16px; color:rgba(232,168,56,0.7); min-height:24px;"></div>
@@ -198,6 +262,10 @@ function connectWS() {
         // AI: Process enriched transcript data
         if (data.type === 'transcript' && data.is_final) {
             updateAIPanel(data);
+        }
+        // Student Questions
+        if (data.type === 'student_question') {
+            showLecturerQuestion(data);
         }
     };
     ws.onclose = () => {
@@ -337,6 +405,7 @@ function broadcastSlide(el) {
     const slideNum = parseInt(el.dataset.slide);
     const desc = el.dataset.desc || '';
     const total = parseInt(el.dataset.total);
+    const imgUrl = el.src || '';
 
     document.querySelectorAll('.slide-thumb').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
@@ -347,6 +416,7 @@ function broadcastSlide(el) {
         slide_number: slideNum,
         description: desc,
         total_slides: total,
+        image_url: imgUrl,
     }));
 }
 
@@ -356,5 +426,82 @@ setInterval(() => {
         ws.send(JSON.stringify({ type: 'heartbeat' }));
     }
 }, 30000);
+
+// Auto-broadcast first slide on page load (so students see slides immediately)
+(function autoShowFirstSlide() {
+    const firstThumb = document.querySelector('.slide-thumb');
+    if (firstThumb && ws) {
+        // Wait for WS to connect, then broadcast first slide
+        const waitForWS = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                clearInterval(waitForWS);
+                broadcastSlide(firstThumb);
+            }
+        }, 500);
+        // Give up after 10 seconds
+        setTimeout(() => clearInterval(waitForWS), 10000);
+    }
+})();
+
+// ═══════════════════════════════════════════════════════
+// STUDENT Q&A PANEL (Lecturer View)
+// ═══════════════════════════════════════════════════════
+let questionCount = 0;
+function showLecturerQuestion(data) {
+    questionCount++;
+    const container = document.getElementById('qaLecturerMessages');
+    const empty = document.getElementById('qaLecturerEmpty');
+    if (empty) empty.remove();
+
+    const msg = document.createElement('div');
+    msg.className = 'qa-lecturer-msg';
+    msg.innerHTML = '<span class="qa-student-name">' + data.student + '</span> <span class="qa-timestamp">' + data.timestamp + '</span><br>' + data.text;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+
+    // Update badge
+    const badge = document.getElementById('qaBadge');
+    badge.style.display = 'inline-flex';
+    badge.textContent = questionCount;
+
+    // Flash the panel border to get attention
+    const panel = document.getElementById('qaLecturerPanel');
+    panel.style.borderColor = 'var(--cyan)';
+    setTimeout(() => { panel.style.borderColor = ''; }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// END SESSION VIA WEBSOCKET (notify students)
+// ═══════════════════════════════════════════════════════
+function endSessionViaWS() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'session_end' }));
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// LECTURER ALERTS / TAG STUDENT
+// ═══════════════════════════════════════════════════════
+function sendLecturerAlert() {
+    const input = document.getElementById('alertInput');
+    const target = document.getElementById('alertTarget').value;
+    const text = input.value.trim();
+    if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify({
+        type: 'lecturer_alert',
+        text: text,
+        target: target,
+    }));
+    input.value = '';
+}
+function quickAlert(text) {
+    const target = document.getElementById('alertTarget').value;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify({
+        type: 'lecturer_alert',
+        text: text,
+        target: target,
+    }));
+}
 </script>
 {% endblock %}

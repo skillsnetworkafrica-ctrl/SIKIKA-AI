@@ -8,7 +8,7 @@ from django.db.models import Count, Q
 from .models import (
     UserProfile, LectureSession, SessionAttendance,
     TranscriptSegment, GlossaryTerm, SessionSlide,
-    LectureSummary, QuizQuestion, LectureAnalytics,
+    LectureSummary, QuizQuestion, LectureAnalytics, StudentNote,
 )
 from .forms import RegisterForm, LectureSessionForm, JoinSessionForm, AccessibilityForm
 from . import ai_services
@@ -104,7 +104,11 @@ def join_session(request):
             )
             return redirect('student_session', session_code=code, mode=mode)
     else:
-        form = JoinSessionForm()
+        # Pre-select user's saved preferred mode
+        initial = {}
+        if hasattr(request.user, 'profile') and request.user.profile.preferred_mode:
+            initial['mode'] = request.user.profile.preferred_mode
+        form = JoinSessionForm(initial=initial)
     return render(request, 'core/join_session.html', {'form': form})
 
 
@@ -185,12 +189,16 @@ def upload_slides(request, session_code):
         for i, f in enumerate(files):
             if not f.content_type.startswith('image/'):
                 continue
-            SessionSlide.objects.create(
+            slide = SessionSlide.objects.create(
                 session=session,
                 slide_number=existing_count + i + 1,
                 image=f,
             )
-        messages.success(request, f'{len(files)} slide(s) uploaded.')
+            # Auto-generate AI description for blind students
+            if slide.image:
+                slide.ai_description = ai_services.generate_slide_description(slide.image.path)
+                slide.save()
+        messages.success(request, f'{len(files)} slide(s) uploaded with AI descriptions.')
         return redirect('lecturer_session', session_code=session_code)
 
     return redirect('lecturer_session', session_code=session_code)
@@ -198,7 +206,7 @@ def upload_slides(request, session_code):
 
 @login_required
 def glossary_api(request):
-    terms = GlossaryTerm.objects.all().values('term', 'definition', 'subject_area')
+    terms = GlossaryTerm.objects.all().values('term', 'definition', 'subject_area', 'sign_description')
     return JsonResponse(list(terms), safe=False)
 
 
@@ -385,3 +393,104 @@ def quiz_api(request, session_code):
             'explanation': q.explanation,
         })
     return JsonResponse(data, safe=False)
+
+
+# ─── SESSION REPLAY VIEW ─────────────────────────────────────────
+
+@login_required
+def session_replay(request, session_code):
+    """Post-session replay with timed transcript playback."""
+    session = get_object_or_404(LectureSession, session_code=session_code)
+    segments = session.segments.all()
+    slides = SessionSlide.objects.filter(session=session).order_by('slide_number')
+
+    # Get user's notes if student
+    notes = []
+    if hasattr(request.user, 'profile') and request.user.profile.role == 'student':
+        notes = StudentNote.objects.filter(session=session, student=request.user)
+
+    # Try to get summary
+    try:
+        summary = session.summary
+    except LectureSummary.DoesNotExist:
+        summary = None
+
+    duration = 0
+    if session.started_at and session.ended_at:
+        duration = int((session.ended_at - session.started_at).total_seconds())
+
+    # Fallback: compute duration from last segment if session wasn't properly ended
+    if duration == 0 and segments.exists():
+        last_seg = segments.order_by('-seconds_from_start').first()
+        if last_seg:
+            duration = int(last_seg.seconds_from_start) + 10
+
+    # Build timeline data as JSON for JS playback
+    import json
+    timeline = []
+    for seg in segments:
+        timeline.append({
+            'time': round(seg.seconds_from_start, 1),
+            'text': seg.text,
+            'has_terms': seg.has_technical_terms,
+        })
+
+    return render(request, 'core/session_replay.html', {
+        'session': session,
+        'segments': segments,
+        'slides': slides,
+        'notes': notes,
+        'summary': summary,
+        'duration': duration,
+        'timeline_json': json.dumps(timeline),
+    })
+
+
+# ─── STUDENT NOTES API ───────────────────────────────────────────
+
+@login_required
+def notes_api(request, session_code):
+    """Create and list student notes for a session."""
+    session = get_object_or_404(LectureSession, session_code=session_code)
+
+    if request.method == 'POST':
+        import json
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        text = data.get('text', '').strip()
+        if not text:
+            return JsonResponse({'error': 'Empty note'}, status=400)
+        timestamp = data.get('timestamp_seconds', 0)
+        note = StudentNote.objects.create(
+            session=session,
+            student=request.user,
+            text=text,
+            timestamp_seconds=timestamp,
+        )
+        return JsonResponse({
+            'id': note.id,
+            'text': note.text,
+            'timestamp_seconds': note.timestamp_seconds,
+            'created_at': note.created_at.strftime('%H:%M'),
+        })
+    else:
+        notes = StudentNote.objects.filter(session=session, student=request.user)
+        data = [{
+            'id': n.id,
+            'text': n.text,
+            'timestamp_seconds': n.timestamp_seconds,
+            'created_at': n.created_at.strftime('%H:%M'),
+        } for n in notes]
+        return JsonResponse(data, safe=False)
+
+
+@login_required
+def delete_note_api(request, note_id):
+    """Delete a student note."""
+    if request.method == 'POST':
+        note = get_object_or_404(StudentNote, id=note_id, student=request.user)
+        note.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'POST required'}, status=405)

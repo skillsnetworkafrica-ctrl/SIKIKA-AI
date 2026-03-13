@@ -620,3 +620,121 @@ def analyze_session(segments_queryset, glossary_terms_dict):
         'wpm_timeline': wpm_timeline,
         'detected_terms': detected,
     }
+
+
+# ─── REAL-TIME EMPHASIS DETECTION ─────────────────────────────────
+
+def detect_emphasis(text):
+    """
+    Detect emphasis/importance markers in real-time text.
+    Returns list of {type, label, icon} for UI markers.
+    Used by WebSocket consumer for live annotation.
+    """
+    markers = []
+    t = text.lower()
+
+    # Key definitions
+    if re.search(r'\b(?:is defined as|means that|refers to|is called|known as|definition of)\b', t):
+        markers.append({'type': 'definition', 'label': 'Definition', 'icon': '📖'})
+
+    # Important emphasis
+    if re.search(r'\b(?:important|crucial|essential|critical|key point|remember|note that|keep in mind|pay attention)\b', t):
+        markers.append({'type': 'important', 'label': 'Important', 'icon': '❗'})
+
+    # Examples
+    if re.search(r'\b(?:for example|for instance|such as|e\.g\.|let me illustrate|consider this)\b', t):
+        markers.append({'type': 'example', 'label': 'Example', 'icon': '📌'})
+
+    # Conclusions / summaries
+    if re.search(r'\b(?:therefore|in conclusion|to summarize|in summary|the result is|hence|thus|so basically)\b', t):
+        markers.append({'type': 'conclusion', 'label': 'Conclusion', 'icon': '🎯'})
+
+    # Questions / prompts
+    if re.search(r'\b(?:what do you think|any questions|does that make sense|do you understand|is that clear)\b', t):
+        markers.append({'type': 'question', 'label': 'Check-in', 'icon': '❓'})
+
+    # Warnings / caveats
+    if re.search(r'\b(?:be careful|common mistake|don\'t confuse|watch out|avoid|trap|pitfall)\b', t):
+        markers.append({'type': 'warning', 'label': 'Warning', 'icon': '⚠️'})
+
+    # Transitions
+    if re.search(r'\b(?:moving on|next topic|let\'s now|now let\'s|turning to|switching to)\b', t):
+        markers.append({'type': 'transition', 'label': 'New Topic', 'icon': '➡️'})
+
+    return markers
+
+
+def generate_live_summary(segments_texts, max_sentences=3):
+    """
+    Generate a quick mid-session summary from accumulated segments.
+    Used for blind students pressing 'M' for on-demand summary.
+    """
+    if not segments_texts:
+        return "No content to summarize yet."
+    full_text = ' '.join(segments_texts)
+    return extractive_summary(full_text, num_sentences=max_sentences)
+
+
+# ─── AI SLIDE DESCRIPTION (Pure Python, no external APIs) ─────────
+
+def generate_slide_description(image_path):
+    """
+    Generate an accessibility description for a slide image.
+    Uses PIL to extract visual properties (colors, dimensions, text regions).
+    Returns a descriptive string for blind students.
+    """
+    try:
+        from PIL import Image, ImageStat
+        img = Image.open(image_path)
+        width, height = img.size
+        mode = img.mode
+
+        # Convert to RGB for analysis
+        if mode != 'RGB':
+            img_rgb = img.convert('RGB')
+        else:
+            img_rgb = img
+
+        stat = ImageStat.Stat(img_rgb)
+        avg_r, avg_g, avg_b = [int(v) for v in stat.mean]
+        brightness = (avg_r * 299 + avg_g * 587 + avg_b * 114) / 1000
+
+        # Determine dominant color tone
+        if brightness > 200:
+            bg_desc = "light background"
+        elif brightness < 80:
+            bg_desc = "dark background"
+        else:
+            bg_desc = "medium-toned background"
+
+        # Determine color dominance
+        if avg_r > avg_g + 30 and avg_r > avg_b + 30:
+            color_desc = "with warm red/orange tones"
+        elif avg_b > avg_r + 30 and avg_b > avg_g + 30:
+            color_desc = "with cool blue tones"
+        elif avg_g > avg_r + 30 and avg_g > avg_b + 30:
+            color_desc = "with green tones"
+        else:
+            color_desc = "with neutral tones"
+
+        # Check image variance (indicates content complexity)
+        variance = sum(stat.var) / 3
+        if variance > 5000:
+            complexity_desc = "This appears to be a complex slide with many visual elements, possibly charts, diagrams, or photos."
+        elif variance > 2000:
+            complexity_desc = "This slide contains moderate visual content, likely text with some graphics."
+        else:
+            complexity_desc = "This appears to be a simple slide, possibly mostly text or a title slide."
+
+        # Orientation
+        orientation = "landscape" if width > height else "portrait" if height > width else "square"
+
+        description = (
+            f"Slide image ({orientation}, {width}x{height}px). "
+            f"{bg_desc.capitalize()} {color_desc}. "
+            f"{complexity_desc}"
+        )
+        return description
+
+    except Exception:
+        return "Slide image uploaded. Visual description could not be generated."

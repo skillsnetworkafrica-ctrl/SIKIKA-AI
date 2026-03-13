@@ -57,6 +57,7 @@
         <h5 style="font-weight:600;">Full Transcript</h5>
         <div class="d-flex gap-2">
             <a href="{% url 'session_summary' session.session_code %}" class="btn btn-sikika btn-sm">🧠 AI Summary</a>
+            <a href="{% url 'session_replay' session.session_code %}" class="btn btn-outline-sikika btn-sm">🔁 Replay</a>
             <a href="{% url 'session_analytics' session.session_code %}" class="btn btn-outline-sikika btn-sm">📊 Analytics</a>
             <a href="{% url 'session_quiz' session.session_code %}" class="btn btn-outline-sikika btn-sm">🧪 Quiz</a>
             <a href="{% url 'download_transcript' session.session_code %}" class="btn btn-outline-sikika btn-sm">📥 Download .txt</a>
