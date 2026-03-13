@@ -71,6 +71,29 @@
     font-size: 12px; transition: all 0.2s;
 }
 .ctrl-btn-lec:hover { background: rgba(232,168,56,0.2); }
+
+/* ─── WHITEBOARD ──────── */
+.wb-panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.wb-toolbar {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px;
+}
+.wb-tool {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: var(--text-secondary); border-radius: 6px; padding: 5px 12px;
+    font-size: 12px; cursor: pointer; transition: all 0.15s;
+}
+.wb-tool:hover, .wb-tool.active { border-color: var(--orange); color: var(--orange); background: rgba(232,168,56,0.08); }
+.wb-canvas-wrap {
+    position: relative; background: #fff; border-radius: 6px; overflow: hidden;
+    cursor: crosshair;
+}
+.wb-canvas-wrap canvas { display: block; width: 100%; }
+.wb-label-input {
+    position: absolute; background: rgba(0,0,0,0.8); border: 1px solid var(--orange);
+    color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 14px;
+    outline: none; z-index: 10; display: none;
+}
 {% endblock %}
 
 {% block content %}
@@ -232,6 +255,38 @@
         <a href="{% url 'session_transcript' session.session_code %}" class="btn btn-sikika">View Full Transcript</a>
     </div>
     {% endif %}
+
+    <!-- ═══════ LIVE WHITEBOARD ═══════ -->
+    <div class="wb-panel mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 style="font-weight:600; margin:0;">Whiteboard</h6>
+            <span style="font-size:11px; color:var(--text-muted);" id="wbStatus">Draw diagrams — blind students hear descriptions</span>
+        </div>
+        <div class="wb-toolbar" id="wbToolbar">
+            <button class="wb-tool active" data-tool="pen" title="Freehand pen">Pen</button>
+            <button class="wb-tool" data-tool="line" title="Straight line">Line</button>
+            <button class="wb-tool" data-tool="arrow" title="Arrow">Arrow</button>
+            <button class="wb-tool" data-tool="rect" title="Rectangle">Rect</button>
+            <button class="wb-tool" data-tool="circle" title="Circle/Ellipse">Circle</button>
+            <button class="wb-tool" data-tool="text" title="Text label">Text</button>
+            <span style="width:1px; height:20px; background:var(--border); margin:0 4px;"></span>
+            <input type="color" id="wbColor" value="#000000" title="Color" style="width:28px; height:28px; border:none; cursor:pointer; border-radius:4px;">
+            <select id="wbSize" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-secondary); border-radius:6px; padding:3px 8px; font-size:12px;">
+                <option value="2">Thin</option>
+                <option value="4" selected>Medium</option>
+                <option value="8">Thick</option>
+            </select>
+            <span style="width:1px; height:20px; background:var(--border); margin:0 4px;"></span>
+            <button class="wb-tool" id="wbUndo" title="Undo last">Undo</button>
+            <button class="wb-tool" id="wbClear" title="Clear board">Clear</button>
+            <button class="wb-tool" id="wbDescribe" title="Announce board to blind students" style="margin-left:auto; border-color:rgba(56,232,112,0.3); color:var(--green);">Describe Board</button>
+        </div>
+        <div class="wb-canvas-wrap" id="wbCanvasWrap">
+            <canvas id="wbCanvas" width="1200" height="500"></canvas>
+            <input type="text" class="wb-label-input" id="wbLabelInput" placeholder="Type label..." maxlength="100">
+        </div>
+    </div>
+
 </div>
 {% endblock %}
 
@@ -515,5 +570,362 @@ function quickAlert(text) {
         target: target,
     }));
 }
+
+// ═══════════════════════════════════════════════════════
+// LIVE WHITEBOARD ENGINE
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('wbCanvas');
+    const ctx = canvas.getContext('2d');
+    const wrap = document.getElementById('wbCanvasWrap');
+    const labelInput = document.getElementById('wbLabelInput');
+
+    let currentTool = 'pen';
+    let penColor = '#000000';
+    let penSize = 4;
+    let isDrawing = false;
+    let startX, startY;
+    // Each item: { type, color, size, points?, x1,y1,x2,y2?, text?, x?,y? }
+    let objects = [];
+    let currentPenPath = [];
+    let snapshot = null; // ImageData for rubber-banding shapes
+
+    // Scale factor for retina / CSS sizing
+    function getScale() {
+        return canvas.width / canvas.offsetWidth;
+    }
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const s = getScale();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (clientX - rect.left) * s, y: (clientY - rect.top) * s };
+    }
+
+    // Toolbar
+    document.querySelectorAll('.wb-tool[data-tool]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.wb-tool[data-tool]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTool = btn.dataset.tool;
+            canvas.style.cursor = currentTool === 'text' ? 'text' : 'crosshair';
+        });
+    });
+    document.getElementById('wbColor').addEventListener('input', e => { penColor = e.target.value; });
+    document.getElementById('wbSize').addEventListener('change', e => { penSize = parseInt(e.target.value); });
+
+    // Undo
+    document.getElementById('wbUndo').addEventListener('click', () => {
+        if (objects.length === 0) return;
+        objects.pop();
+        redraw();
+        broadcastBoard();
+    });
+
+    // Clear
+    document.getElementById('wbClear').addEventListener('click', () => {
+        objects = [];
+        redraw();
+        broadcastBoard();
+    });
+
+    // ─── DRAWING ─────────────────────────────────
+    canvas.addEventListener('mousedown', onDown);
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseup', onUp);
+    canvas.addEventListener('mouseleave', onUp);
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); onDown(e); });
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); onMove(e); });
+    canvas.addEventListener('touchend', e => { e.preventDefault(); onUp(e); });
+
+    function onDown(e) {
+        if (currentTool === 'text') {
+            placeTextInput(e);
+            return;
+        }
+        isDrawing = true;
+        const pos = getPos(e);
+        startX = pos.x; startY = pos.y;
+        if (currentTool === 'pen') {
+            currentPenPath = [{ x: pos.x, y: pos.y }];
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        } else {
+            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function onMove(e) {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        if (currentTool === 'pen') {
+            currentPenPath.push({ x: pos.x, y: pos.y });
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = penSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        } else {
+            // Rubber-band preview
+            ctx.putImageData(snapshot, 0, 0);
+            drawShape(currentTool, startX, startY, pos.x, pos.y, penColor, penSize);
+        }
+    }
+
+    function onUp(e) {
+        if (!isDrawing) return;
+        isDrawing = false;
+        const pos = e.type === 'mouseleave' ? { x: startX, y: startY } : getPos(e);
+        if (currentTool === 'pen') {
+            objects.push({ type: 'pen', color: penColor, size: penSize, points: [...currentPenPath] });
+        } else {
+            objects.push({ type: currentTool, color: penColor, size: penSize, x1: startX, y1: startY, x2: pos.x, y2: pos.y });
+        }
+        currentPenPath = [];
+        snapshot = null;
+        broadcastBoard();
+    }
+
+    // ─── TEXT LABELS ─────────────────────────────
+    function placeTextInput(e) {
+        const pos = getPos(e);
+        const rect = canvas.getBoundingClientRect();
+        const s = getScale();
+        labelInput.style.display = 'block';
+        labelInput.style.left = (pos.x / s) + 'px';
+        labelInput.style.top = (pos.y / s) + 'px';
+        labelInput.value = '';
+        labelInput.focus();
+        labelInput.onkeydown = function(ev) {
+            if (ev.key === 'Enter' && labelInput.value.trim()) {
+                objects.push({ type: 'text', color: penColor, size: Math.max(penSize * 4, 16), text: labelInput.value.trim(), x: pos.x, y: pos.y });
+                labelInput.style.display = 'none';
+                redraw();
+                broadcastBoard();
+            } else if (ev.key === 'Escape') {
+                labelInput.style.display = 'none';
+            }
+        };
+    }
+
+    // ─── SHAPE DRAWING ───────────────────────────
+    function drawShape(type, x1, y1, x2, y2, color, size) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        if (type === 'line') {
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        } else if (type === 'arrow') {
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            // Arrowhead
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const headLen = 12 + size * 2;
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        } else if (type === 'rect') {
+            ctx.beginPath(); ctx.rect(x1, y1, x2 - x1, y2 - y1); ctx.stroke();
+        } else if (type === 'circle') {
+            const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+            const rx = Math.abs(x2 - x1) / 2, ry = Math.abs(y2 - y1) / 2;
+            ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+        }
+    }
+
+    function drawText(obj) {
+        ctx.fillStyle = obj.color;
+        ctx.font = 'bold ' + obj.size + 'px sans-serif';
+        ctx.fillText(obj.text, obj.x, obj.y);
+    }
+
+    function redraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        objects.forEach(obj => {
+            if (obj.type === 'pen' && obj.points.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = obj.color;
+                ctx.lineWidth = obj.size;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.moveTo(obj.points[0].x, obj.points[0].y);
+                for (let i = 1; i < obj.points.length; i++) {
+                    ctx.lineTo(obj.points[i].x, obj.points[i].y);
+                }
+                ctx.stroke();
+            } else if (obj.type === 'text') {
+                drawText(obj);
+            } else if (obj.type !== 'pen') {
+                drawShape(obj.type, obj.x1, obj.y1, obj.x2, obj.y2, obj.color, obj.size);
+            }
+        });
+    }
+
+    // ─── BROADCAST TO STUDENTS VIA WS ────────────
+    function broadcastBoard() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
+        // Send compact object list + auto-generated description
+        const description = describeBoard(objects);
+        ws.send(JSON.stringify({
+            type: 'whiteboard',
+            objects: objects.map(simplifyObj),
+            description: description,
+        }));
+        document.getElementById('wbStatus').textContent = objects.length + ' element' + (objects.length !== 1 ? 's' : '') + ' on board';
+    }
+
+    // Simplify pen paths to reduce payload (keep every Nth point)
+    function simplifyObj(obj) {
+        if (obj.type === 'pen' && obj.points.length > 10) {
+            const step = Math.max(2, Math.floor(obj.points.length / 30));
+            const simplified = obj.points.filter((_, i) => i === 0 || i === obj.points.length - 1 || i % step === 0);
+            return { ...obj, points: simplified };
+        }
+        return obj;
+    }
+
+    // ─── DESCRIBE BOARD BUTTON ────────────────────
+    document.getElementById('wbDescribe').addEventListener('click', () => {
+        if (objects.length === 0) return;
+        const desc = describeBoard(objects);
+        ws.send(JSON.stringify({
+            type: 'whiteboard_describe',
+            description: desc,
+        }));
+        document.getElementById('wbStatus').textContent = 'Description sent to students';
+        setTimeout(() => {
+            document.getElementById('wbStatus').textContent = objects.length + ' element' + (objects.length !== 1 ? 's' : '') + ' on board';
+        }, 3000);
+    });
+
+    // ═══════════════════════════════════════════════
+    // DIAGRAM ANALYSIS ENGINE — The Innovation
+    // Converts canvas objects into natural language
+    // ═══════════════════════════════════════════════
+
+    function describeBoard(objs) {
+        if (objs.length === 0) return 'The whiteboard is empty.';
+
+        const W = canvas.width, H = canvas.height;
+        const parts = [];
+        const textLabels = [];
+        const shapes = [];
+        const arrows = [];
+        const lines = [];
+        const drawings = [];
+
+        objs.forEach((obj, i) => {
+            if (obj.type === 'text') {
+                textLabels.push({ text: obj.text, x: obj.x, y: obj.y, idx: i });
+            } else if (obj.type === 'rect') {
+                shapes.push({ kind: 'rectangle', ...obj, cx: (obj.x1+obj.x2)/2, cy: (obj.y1+obj.y2)/2, idx: i });
+            } else if (obj.type === 'circle') {
+                shapes.push({ kind: 'circle', ...obj, cx: (obj.x1+obj.x2)/2, cy: (obj.y1+obj.y2)/2, idx: i });
+            } else if (obj.type === 'arrow') {
+                arrows.push(obj);
+            } else if (obj.type === 'line') {
+                lines.push(obj);
+            } else if (obj.type === 'pen') {
+                drawings.push(obj);
+            }
+        });
+
+        // Spatial position helper
+        function posName(x, y) {
+            const col = x < W * 0.33 ? 'left' : x < W * 0.66 ? 'center' : 'right';
+            const row = y < H * 0.33 ? 'top' : y < H * 0.66 ? 'middle' : 'bottom';
+            return row + '-' + col;
+        }
+        function posDesc(x, y) {
+            const col = x < W * 0.33 ? 'on the left' : x < W * 0.66 ? 'in the center' : 'on the right';
+            const row = y < H * 0.33 ? 'at the top' : y < H * 0.66 ? 'in the middle' : 'at the bottom';
+            return row + ' ' + col;
+        }
+
+        // Find labels near a shape
+        function findLabel(cx, cy, radius) {
+            let best = null, bestDist = radius || 80;
+            textLabels.forEach(t => {
+                const d = Math.sqrt((t.x - cx) ** 2 + (t.y - cy) ** 2);
+                if (d < bestDist) { bestDist = d; best = t; }
+            });
+            return best;
+        }
+
+        // Find shape near a point
+        function findShapeNear(x, y, threshold) {
+            let best = null, bestDist = threshold || 100;
+            shapes.forEach(s => {
+                const d = Math.sqrt((s.cx - x) ** 2 + (s.cy - y) ** 2);
+                if (d < bestDist) { bestDist = d; best = s; }
+            });
+            return best;
+        }
+
+        // Describe shapes with labels
+        const labeledShapes = [];
+        shapes.forEach(s => {
+            const label = findLabel(s.cx, s.cy, 120);
+            const labelText = label ? ' labeled "' + label.text + '"' : '';
+            const pos = posDesc(s.cx, s.cy);
+            labeledShapes.push({
+                desc: 'A ' + s.kind + labelText + ' ' + pos,
+                label: label ? label.text : null,
+                shape: s,
+            });
+        });
+
+        // Describe arrows as connections
+        arrows.forEach(a => {
+            const fromShape = findShapeNear(a.x1, a.y1, 120);
+            const toShape = findShapeNear(a.x2, a.y2, 120);
+            const fromLabel = fromShape ? findLabel(fromShape.cx, fromShape.cy, 120) : findLabel(a.x1, a.y1, 60);
+            const toLabel = toShape ? findLabel(toShape.cx, toShape.cy, 120) : findLabel(a.x2, a.y2, 60);
+            const from = fromLabel ? '"' + fromLabel.text + '"' : posDesc(a.x1, a.y1);
+            const to = toLabel ? '"' + toLabel.text + '"' : posDesc(a.x2, a.y2);
+            parts.push('Arrow from ' + from + ' pointing to ' + to);
+        });
+
+        // Describe lines
+        lines.forEach(l => {
+            const from = posDesc(l.x1, l.y1);
+            const to = posDesc(l.x2, l.y2);
+            parts.push('A line from ' + from + ' to ' + to);
+        });
+
+        // Describe standalone text labels (not near shapes)
+        const usedLabels = new Set();
+        labeledShapes.forEach(ls => { if (ls.label) usedLabels.add(ls.label); });
+        textLabels.forEach(t => {
+            if (!usedLabels.has(t.text)) {
+                parts.push('Text "' + t.text + '" ' + posDesc(t.x, t.y));
+            }
+        });
+
+        // Assemble
+        if (drawings.length > 0) {
+            parts.unshift(drawings.length + ' freehand drawing' + (drawings.length > 1 ? 's' : ''));
+        }
+        labeledShapes.forEach(ls => parts.push(ls.desc));
+
+        // Try to infer diagram type
+        let summary = '';
+        if (arrows.length >= 2 && shapes.length >= 3) {
+            summary = 'This appears to be a flowchart or process diagram with ' + shapes.length + ' shapes connected by ' + arrows.length + ' arrows. ';
+        } else if (arrows.length >= 1 && shapes.length >= 2) {
+            summary = 'This appears to be a diagram showing relationships between elements. ';
+        } else if (shapes.length >= 2 && lines.length >= 1) {
+            summary = 'This appears to be a structural diagram. ';
+        }
+
+        return summary + parts.join('. ') + '.';
+    }
+})();
 </script>
 {% endblock %}

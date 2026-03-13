@@ -211,6 +211,27 @@ class LectureConsumer(AsyncWebsocketConsumer):
                 'segment_count': len(self.all_segments_text),
             }))
 
+        # ─── WHITEBOARD SYNC ──────────────────────────────────
+        elif msg_type == 'whiteboard':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'broadcast_whiteboard',
+                    'objects': data.get('objects', []),
+                    'description': data.get('description', ''),
+                }
+            )
+
+        # ─── WHITEBOARD DESCRIBE (lecturer presses Describe) ──
+        elif msg_type == 'whiteboard_describe':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'broadcast_whiteboard_describe',
+                    'description': data.get('description', ''),
+                }
+            )
+
     async def broadcast_transcript(self, event):
         await self.send(text_data=json.dumps({
             'type': 'transcript',
@@ -265,6 +286,19 @@ class LectureConsumer(AsyncWebsocketConsumer):
             'text': event['text'],
             'target': event['target'],
             'timestamp': event['timestamp'],
+        }))
+
+    async def broadcast_whiteboard(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'whiteboard',
+            'objects': event['objects'],
+            'description': event['description'],
+        }))
+
+    async def broadcast_whiteboard_describe(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'whiteboard_describe',
+            'description': event['description'],
         }))
 
     @database_sync_to_async

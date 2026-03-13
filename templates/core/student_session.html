@@ -223,6 +223,7 @@
         <kbd>M</kbd> AI summary so far &nbsp;
         <kbd>T</kbd> Hear detected terms &nbsp;
         <kbd>S</kbd> Hear current slide &nbsp;
+        <kbd>W</kbd> Hear whiteboard description &nbsp;
         <kbd>H</kbd> Toggle this help &nbsp;
         <kbd>Q</kbd> Focus question input &nbsp;
         <kbd>↑↓</kbd> Adjust speech speed &nbsp;
@@ -278,6 +279,21 @@
         <img src="{{ slide.image.url }}" id="slideImg{{ slide.slide_number }}" style="display:none;" alt="Slide {{ slide.slide_number }}{% if slide.ai_description %}: {{ slide.ai_description }}{% endif %}">
         {% endfor %}
         <p id="slideDescription" style="font-style:italic;"></p>
+    </div>
+
+    <!-- ═══════ LIVE WHITEBOARD (READ-ONLY) ═══════ -->
+    <div id="wbStudentPanel" style="display:none; margin-top:16px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; padding:12px;" role="region" aria-label="Lecturer whiteboard">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span style="font-size:13px; font-weight:600; color:var(--text-secondary);">Whiteboard</span>
+            <span style="font-size:11px; color:var(--text-muted);" id="wbStudentStatus">Live</span>
+        </div>
+        <div style="background:#fff; border-radius:6px; overflow:hidden;">
+            <canvas id="wbStudentCanvas" width="1200" height="500" style="display:block; width:100%;" role="img" aria-label="Lecturer whiteboard drawing"></canvas>
+        </div>
+        {% if mode == 'audio' %}
+        <div id="wbAudioDesc" style="margin-top:8px; padding:8px 12px; background:rgba(56,232,112,0.05); border:1px solid rgba(56,232,112,0.1); border-radius:6px; font-size:13px; color:var(--green); display:none;" role="status" aria-live="polite">
+        </div>
+        {% endif %}
     </div>
 
     <!-- ═══════ STUDENT Q&A PANEL ═══════ -->
@@ -576,6 +592,24 @@ function connectWS() {
             if (!data.target || data.target === myUsername) {
                 showLecturerAlert(data.text, data.target);
             }
+        }
+        // ─── WHITEBOARD SYNC ───
+        else if (data.type === 'whiteboard') {
+            renderWhiteboard(data.objects || []);
+            lastWbDescription = data.description || '';
+            // Show panel if hidden
+            const panel = document.getElementById('wbStudentPanel');
+            if (panel) panel.style.display = 'block';
+        }
+        // ─── WHITEBOARD DESCRIBE (lecturer pressed Describe) ───
+        else if (data.type === 'whiteboard_describe') {
+            const desc = data.description || '';
+            if (mode === 'audio' && audioEnabled && desc) {
+                AudioEngine.speak('Whiteboard: ' + desc, 'high');
+            }
+            announceToScreen('Whiteboard: ' + desc);
+            const descEl = document.getElementById('wbAudioDesc');
+            if (descEl) { descEl.textContent = desc; descEl.style.display = 'block'; }
         }
     };
 
@@ -1060,6 +1094,15 @@ document.addEventListener('keydown', function(e) {
                 AudioEngine.speak('No slides shown yet.', 'high');
             }
         }
+        // W: Hear whiteboard description
+        else if (key === 'w') {
+            e.preventDefault();
+            if (lastWbDescription) {
+                AudioEngine.speak('Whiteboard: ' + lastWbDescription, 'high');
+            } else {
+                AudioEngine.speak('No whiteboard content yet.', 'high');
+            }
+        }
         // H: Toggle help panel
         else if (key === 'h') {
             e.preventDefault();
@@ -1068,7 +1111,7 @@ document.addEventListener('keydown', function(e) {
                 const visible = panel.style.display !== 'none';
                 panel.style.display = visible ? 'none' : 'block';
                 if (!visible) {
-                    AudioEngine.speak('Keyboard shortcuts. Space: pause or resume. R: replay last. M: AI summary. T: terms list. S: slide info. Q: ask a question. N: open notes. Up and Down arrows: adjust speed. Escape: leave session.', 'high');
+                    AudioEngine.speak('Keyboard shortcuts. Space: pause or resume. R: replay last. M: AI summary. T: terms list. S: slide info. W: whiteboard description. Q: ask a question. N: open notes. Up and Down arrows: adjust speed. Escape: leave session.', 'high');
                 }
             }
         }
@@ -1144,8 +1187,79 @@ setInterval(() => {
 // Welcome announcement for blind users
 if (mode === 'audio') {
     setTimeout(() => {
-        AudioEngine.speak('Welcome to SIKIKA audio mode for ' + '{{ session.title }}' + '. Press H for keyboard shortcuts. Waiting for the lecturer to start speaking.', 'high');
+        AudioEngine.speak('Welcome to SIKIKA audio mode for ' + '{{ session.title }}' + '. Press H for keyboard shortcuts. Press W to hear whiteboard description. Waiting for the lecturer to start speaking.', 'high');
     }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════
+// WHITEBOARD RENDERER (READ-ONLY)
+// ═══════════════════════════════════════════════════════
+let lastWbDescription = '';
+
+function renderWhiteboard(objects) {
+    const canvas = document.getElementById('wbStudentCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    objects.forEach(obj => {
+        ctx.strokeStyle = obj.color || '#000';
+        ctx.lineWidth = obj.size || 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        if (obj.type === 'pen' && obj.points && obj.points.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(obj.points[0].x, obj.points[0].y);
+            for (let i = 1; i < obj.points.length; i++) {
+                ctx.lineTo(obj.points[i].x, obj.points[i].y);
+            }
+            ctx.stroke();
+        } else if (obj.type === 'line') {
+            ctx.beginPath();
+            ctx.moveTo(obj.x1, obj.y1);
+            ctx.lineTo(obj.x2, obj.y2);
+            ctx.stroke();
+        } else if (obj.type === 'arrow') {
+            ctx.beginPath();
+            ctx.moveTo(obj.x1, obj.y1);
+            ctx.lineTo(obj.x2, obj.y2);
+            ctx.stroke();
+            const angle = Math.atan2(obj.y2 - obj.y1, obj.x2 - obj.x1);
+            const headLen = 12 + (obj.size || 2) * 2;
+            ctx.beginPath();
+            ctx.moveTo(obj.x2, obj.y2);
+            ctx.lineTo(obj.x2 - headLen * Math.cos(angle - Math.PI / 6), obj.y2 - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(obj.x2, obj.y2);
+            ctx.lineTo(obj.x2 - headLen * Math.cos(angle + Math.PI / 6), obj.y2 - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        } else if (obj.type === 'rect') {
+            ctx.beginPath();
+            ctx.rect(obj.x1, obj.y1, obj.x2 - obj.x1, obj.y2 - obj.y1);
+            ctx.stroke();
+        } else if (obj.type === 'circle') {
+            const cx = (obj.x1 + obj.x2) / 2, cy = (obj.y1 + obj.y2) / 2;
+            const rx = Math.abs(obj.x2 - obj.x1) / 2, ry = Math.abs(obj.y2 - obj.y1) / 2;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (obj.type === 'text') {
+            ctx.fillStyle = obj.color || '#000';
+            ctx.font = 'bold ' + (obj.size || 16) + 'px sans-serif';
+            ctx.fillText(obj.text, obj.x, obj.y);
+        }
+    });
+
+    // Update status
+    const statusEl = document.getElementById('wbStudentStatus');
+    if (statusEl) statusEl.textContent = objects.length + ' element' + (objects.length !== 1 ? 's' : '');
+
+    // Update aria-label on canvas for screen readers
+    if (lastWbDescription) {
+        canvas.setAttribute('aria-label', lastWbDescription);
+    }
 }
 </script>
 {% endblock %}
