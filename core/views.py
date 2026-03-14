@@ -30,6 +30,11 @@ def presentation_final(request):
     return FileResponse(open(file_path, 'rb'), content_type='text/html')
 
 
+def presentation_v3(request):
+    file_path = Path(settings.BASE_DIR) / 'presentation_v3.html'
+    return FileResponse(open(file_path, 'rb'), content_type='text/html')
+
+
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)

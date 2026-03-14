@@ -31,4 +31,5 @@ urlpatterns = [
     # Presentations
     path('pitch/room/', views.presentation_room, name='presentation_room'),
     path('pitch/final/', views.presentation_final, name='presentation_final'),
+    path('pitch/v3/', views.presentation_v3, name='presentation_v3'),
 ]
