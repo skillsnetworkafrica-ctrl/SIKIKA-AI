@@ -28,4 +28,7 @@ urlpatterns = [
     path('join/', views.join_session, name='join_session'),
     path('live/<str:session_code>/<str:mode>/', views.student_session, name='student_session'),
     path('api/glossary/', views.glossary_api, name='glossary_api'),
+    # Presentations
+    path('pitch/room/', views.presentation_room, name='presentation_room'),
+    path('pitch/final/', views.presentation_final, name='presentation_final'),
 ]

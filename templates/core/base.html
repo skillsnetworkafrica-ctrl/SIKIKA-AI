@@ -73,6 +73,8 @@
         }
         .nav-link { color: var(--text-secondary) !important; font-size: 14px; }
         .nav-link:hover { color: #fff !important; }
+        .dropdown-item:hover { background: rgba(255,255,255,0.05); color: #fff !important; }
+        .dropdown-item:focus { background: rgba(232,168,56,0.15); color: var(--orange) !important; }
         .btn-sikika {
             background: var(--orange);
             color: var(--navy);
@@ -171,6 +173,13 @@
     <nav class="navbar navbar-expand-lg navbar-dark px-4" role="navigation" aria-label="Main navigation">
         <a class="navbar-brand" href="{% url 'home' %}" aria-label="SIKIKA Home">SIKIKA</a>
         <div class="ms-auto d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:13px;">Pitch</a>
+                <ul class="dropdown-menu dropdown-menu-end" style="background:var(--navy-light);border:1px solid var(--border);min-width:180px;">
+                    <li><a class="dropdown-item" href="{% url 'presentation_room' %}" target="_blank" style="color:var(--text-secondary);font-size:13px;">Room Round (7 slides)</a></li>
+                    <li><a class="dropdown-item" href="{% url 'presentation_final' %}" target="_blank" style="color:var(--text-secondary);font-size:13px;">Final Round (10 slides)</a></li>
+                </ul>
+            </div>
             {% if user.is_authenticated %}
                 <span class="nav-link" aria-hidden="true">{{ user.username }}</span>
                 <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>

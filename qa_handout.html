@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIKIKA — Q&A Preparation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+
+        @page { size: A4; margin: 0; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            width: 210mm;
+            margin: 0 auto;
+            background: #fff;
+            color: #0a1628;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 8mm 12mm 8mm 12mm;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* === HEADER === */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3mm;
+            padding-bottom: 3mm;
+            border-bottom: 3px solid #0a1628;
+        }
+
+        .brand { flex: 1; }
+
+        .brand h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28pt;
+            font-weight: 900;
+            color: #0a1628;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .brand .tagline {
+            font-size: 8pt;
+            font-weight: 700;
+            color: #e8a838;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 1mm;
+        }
+
+        .header-right {
+            text-align: right;
+            padding-top: 2mm;
+        }
+
+        .header-right .event {
+            font-size: 7.5pt;
+            font-weight: 600;
+            color: #0a1628;
+        }
+
+        .header-right .team {
+            font-size: 7pt;
+            color: #666;
+            margin-top: 1mm;
+        }
+
+        .header-right .speakers {
+            font-size: 6.5pt;
+            color: #999;
+            margin-top: 1mm;
+        }
+
+        .speakers strong { color: #0a1628; }
+
+        /* === CATEGORY HEADER === */
+        .cat-header {
+            background: #0a1628;
+            color: #e8a838;
+            font-size: 7.5pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 1.5mm 3mm;
+            border-radius: 3px;
+            margin-top: 3mm;
+            margin-bottom: 2mm;
+        }
+
+        .cat-header:first-of-type { margin-top: 2mm; }
+
+        /* === Q&A ITEM === */
+        .qa-item {
+            margin-bottom: 2mm;
+            page-break-inside: avoid;
+        }
+
+        .qa-question {
+            font-size: 7.5pt;
+            font-weight: 700;
+            color: #e84040;
+            margin-bottom: 0.5mm;
+            line-height: 1.3;
+        }
+
+        .qa-speaker {
+            font-size: 6pt;
+            font-weight: 600;
+            color: #fff;
+            background: #0a1628;
+            padding: 0.3mm 2mm;
+            border-radius: 2px;
+            display: inline-block;
+            margin-bottom: 0.5mm;
+        }
+
+        .qa-answer {
+            font-size: 7pt;
+            color: #333;
+            line-height: 1.45;
+            padding-left: 3mm;
+            border-left: 2px solid #e8a838;
+        }
+
+        .qa-answer strong { color: #0a1628; }
+        .qa-answer .stat { color: #e84040; font-weight: 600; }
+
+        .qa-followup {
+            font-size: 6.5pt;
+            color: #666;
+            font-style: italic;
+            padding-left: 3mm;
+            margin-top: 0.5mm;
+            line-height: 1.3;
+        }
+
+        /* === TWO COLUMN === */
+        .two-col {
+            display: flex;
+            gap: 4mm;
+        }
+
+        .col { flex: 1; }
+
+        /* === RESPONSE TEMPLATES === */
+        .template-box {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            padding: 2mm 3mm;
+            margin-bottom: 1.5mm;
+        }
+
+        .template-label {
+            font-size: 6.5pt;
+            font-weight: 700;
+            color: #0a1628;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5mm;
+        }
+
+        .template-text {
+            font-size: 6.5pt;
+            color: #444;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* === CHECKLIST === */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            font-size: 6.5pt;
+            padding: 0.8mm 0 0.8mm 4mm;
+            position: relative;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: #e8a838;
+            font-weight: 700;
+        }
+
+        .checklist li strong { color: #0a1628; }
+
+        /* === SECTION TITLE === */
+        .section-title {
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: #0a1628;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.5mm;
+            padding-bottom: 1mm;
+            border-bottom: 2px solid #e8a838;
+        }
+
+        .section-title.red-border { border-bottom-color: #e84040; }
+        .section-title.green-border { border-bottom-color: #1a8a4a; }
+
+        /* === FOOTER === */
+        .footer {
+            position: absolute;
+            bottom: 6mm;
+            left: 12mm;
+            right: 12mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2mm;
+            border-top: 1px solid #ddd;
+        }
+
+        .footer-left {
+            font-size: 6pt;
+            color: #999;
+        }
+
+        .footer-center {
+            text-align: center;
+            flex: 2;
+        }
+
+        .footer-center .motto {
+            font-family: 'Playfair Display', serif;
+            font-size: 7.5pt;
+            font-style: italic;
+            color: #0a1628;
+        }
+
+        .footer-right {
+            text-align: right;
+            font-size: 6pt;
+            color: #999;
+        }
+
+        /* === PRINT === */
+        @media print {
+            body { margin: 0; }
+            .page { padding: 8mm 12mm 8mm 12mm; }
+            .no-print { display: none; }
+        }
+
+        @media screen {
+            body { background: #e0e0e0; padding: 20px 0; }
+            .page { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.2); margin: 0 auto 20px; }
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0a1628;
+            color: #e8a838;
+            border: none;
+            padding: 10px 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .print-btn:hover { background: #1a2a48; }
+        @media print { .print-btn { display: none; } }
+
+        .page-label {
+            font-size: 6pt;
+            color: #999;
+            text-align: right;
+            margin-bottom: 1mm;
+        }
+    </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Print Q&A Guide</button>
+
+<!-- ==================== PAGE 1 ==================== -->
+<div class="page">
+    <div class="page-label">INTERNAL — Q&A Preparation &middot; Page 1 of 2</div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="brand">
+            <h1>SIKIKA</h1>
+            <div class="tagline">Q&A Preparation Guide</div>
+        </div>
+        <div class="header-right">
+            <div class="event">USIU-Africa Innovation Challenge 2026</div>
+            <div class="team">Team CAMPUS_IQ</div>
+            <div class="speakers"><strong>Iranzi</strong> (Technical) &middot; <strong>Deogracia</strong> (Business) &middot; <strong>Daisy</strong> (Impact/UX)</div>
+        </div>
+    </div>
+
+    <!-- CATEGORY 1: TECHNICAL -->
+    <div class="cat-header">1 &mdash; Technical Accuracy & Reliability</div>
+
+    <div class="qa-item">
+        <div class="qa-question">"How accurate is the speech recognition, especially with African accents?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Web Speech API leverages Google's models trained on millions of hours. Clear English: <strong class="stat">92&ndash;97%</strong> accuracy. African accents (Kenyan, Rwandan, Nigerian): <strong class="stat">85&ndash;92%</strong> &mdash; already better than interpreters where <strong class="stat">20&ndash;30% content is lost</strong>. Technical terms are highlighted separately through our term detection engine.
+        </div>
+        <div class="qa-followup">If pressed: "Building a feedback loop — lecturers correct terms post-session, improving future recognition for their speech patterns."</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"What happens when the internet goes down mid-lecture?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            WebSocket maintains persistent connection. Brief drops: <strong>auto-reconnects in seconds</strong>, transcript preserved. Full outage: lecturer records locally, uploads afterward for async transcription. On campus WiFi, sustained outages are rare &mdash; and when they happen, human interpreters can't help if they aren't there either.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"How does whiteboard diagram analysis actually work?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            HTML5 canvas captures every stroke as <strong>vector data</strong> &mdash; shapes, connections, text labels. No image recognition. Engine identifies rectangles, circles, arrows, reads labels, generates natural-language descriptions: <em>"A Client node connects to a Server node via a data flow arrow."</em> Sent via WebSocket and read aloud. <strong>Deterministic, not probabilistic</strong> &mdash; reliable and fast.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"Why not just use Google Live Transcribe or Otter.ai?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            <strong>1)</strong> Those are individual consumer apps (one person, one device). SIKIKA is <strong>one-to-many</strong> &mdash; broadcasts to 200+ students simultaneously. <strong>2)</strong> None have diagram analysis. Professor draws on whiteboard &rarr; Google captures nothing. <strong>3)</strong> Neither offers sign language output. SIKIKA provides 3 modes from one input. Different category entirely.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"What about data privacy?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Speech recognition runs <strong>in the browser</strong> &mdash; audio not stored on our servers. Transcripts flow through Django Channels WebSocket, deployable <strong>on university infrastructure</strong>. We store only text, tied to sessions. Universities control retention. GDPR + Kenya Data Protection Act compliant. On-premise deployment available.
+        </div>
+    </div>
+
+    <!-- CATEGORY 2: BUSINESS -->
+    <div class="cat-header">2 &mdash; Business & Market</div>
+
+    <div class="qa-item">
+        <div class="qa-question">"Who's paying? African universities don't have big tech budgets."</div>
+        <span class="qa-speaker">Deogracia</span>
+        <div class="qa-answer">
+            Pricing starts at <strong class="stat">$2,000/year</strong> &mdash; less than one semester of interpreter services. Multiple revenue paths: <strong>disability councils, USAID, DFID, WHO</strong>. Kenya's Persons with Disabilities Act <strong>requires</strong> reasonable accommodation. We help universities comply at a fraction of current costs. Not asking to add budget &mdash; offering a way to meet <strong>legal obligations they're already failing</strong>.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"$2.9M ARR by year three seems ambitious."</div>
+        <span class="qa-speaker">Deogracia</span>
+        <div class="qa-answer">
+            <strong>80 university subscriptions</strong> out of 1,500+ African universities = <strong class="stat">~5% penetration</strong>. Average contract <strong>$36K/year</strong> (still 85% cheaper than interpreters). Start Kenya + Rwanda Y1, East Africa Y2, pan-African Y3. Once one university adopts &rarr; <strong>peer + regulatory pressure drives others</strong>. Disability compliance is a rising tide.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"What's your competitive moat? What stops Google from building this?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Google could build transcription. Can't easily build a <strong>purpose-built classroom platform</strong>: diagram analysis + sign output + session management + student customization &mdash; all designed for African constraints (low bandwidth, varied accents, limited IT). Our moat: <strong>domain specificity + early mover advantage + local partnerships = institutional switching costs</strong>.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"How do you make money before universities pay?"</div>
+        <span class="qa-speaker">Deogracia</span>
+        <div class="qa-answer">
+            Seeking <strong class="stat">$250K seed</strong> for 18 months: product dev, pilots at 3&ndash;5 universities, initial hires. Pilots are <strong>free in exchange for data + case studies</strong> &mdash; our primary sales tool. By month 12, convert to paid. Also eligible for <strong>Mastercard Foundation, Skoll Foundation, AfDB</strong> disability inclusion grants.
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer-left">Team CAMPUS_IQ &middot; March 2026</div>
+        <div class="footer-center"><div class="motto">"We don't replace the interpreter. We replace the need for one."</div></div>
+        <div class="footer-right">INTERNAL PREPARATION ONLY</div>
+    </div>
+</div>
+
+<!-- ==================== PAGE 2 ==================== -->
+<div class="page">
+    <div class="page-label">INTERNAL — Q&A Preparation &middot; Page 2 of 2</div>
+
+    <!-- CATEGORY 3: IMPACT -->
+    <div class="cat-header" style="margin-top:1mm;">3 &mdash; Impact & Inclusion</div>
+
+    <div class="qa-item">
+        <div class="qa-question">"How do you measure actual impact on student outcomes?"</div>
+        <span class="qa-speaker">Daisy</span>
+        <div class="qa-answer">
+            Three metrics: <strong>1) Content access rate</strong> &mdash; interpreters deliver 70&ndash;80%, SIKIKA delivers <strong class="stat">95&ndash;100%</strong>. <strong>2) Visual content access</strong> &mdash; previously zero for diagrams, now described in real time. <strong>3) Session replay usage</strong> &mdash; improves retention by 20&ndash;30%. Tracked via built-in analytics: transcript completeness, session duration, replay frequency, satisfaction surveys.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"Isn't this just a band-aid? Shouldn't we train more interpreters?"</div>
+        <span class="qa-speaker">Daisy</span>
+        <div class="qa-answer">
+            Absolutely, train more interpreters. Kenya needs <strong class="stat">~15,000</strong> to reach adequate coverage. At current rates, that's <strong>decades away</strong>. Students can't wait decades. SIKIKA provides <strong>immediate, scalable access today</strong> while human capacity is built. Like solar panels &mdash; you build them now while also investing in the grid. <strong>Complementary, not competing.</strong>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"What about students who prefer human interaction over AI?"</div>
+        <span class="qa-speaker">Daisy</span>
+        <div class="qa-answer">
+            That preference is valid. SIKIKA is <strong>additive</strong> &mdash; students with interpreters can still use captions as backup. The real question: what about the <strong class="stat">99% of disabled students who have NO support at all?</strong> They don't have the luxury of preference. <strong>SIKIKA serves the gap, not the replacement.</strong>
+        </div>
+    </div>
+
+    <!-- CATEGORY 4: ROADMAP -->
+    <div class="cat-header">4 &mdash; Technical Roadmap</div>
+
+    <div class="qa-item">
+        <div class="qa-question">"The sign language avatar — is it real or future?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Today: text &rarr; visual sign representation. Full <strong>3D avatar with KSL</strong> is on 12-month roadmap. Infrastructure is built (text pipeline, WebSocket, student interface). Adding animation layer on top. Evaluating partnerships with <strong>SignAll + MotionSavvy</strong>. The hardest part &mdash; real-time text generation and delivery &mdash; is done. Avatar is an <strong>interface upgrade, not architectural change</strong>.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"How does it scale to multiple languages?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Web Speech API supports <strong>100+ languages</strong> including Swahili, Amharic, Yoruba, Zulu. Architecture is <strong>language-agnostic</strong> &mdash; adding a language is a config change, not code. Sign languages (KSL, ASL, BSL) each need their own avatar model &mdash; costlier. Starting with KSL, expanding by demand + partnerships.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"What about STEM content — equations, formulas, code?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Term highlighting handles STEM vocabulary. Whiteboard engine captures equation symbols + spatial relationships &rarr; describes as <em>"x&sup2; + 2x &minus; 5 = 0"</em>. For code (typically on-screen, not spoken): next integration is <strong>screen-sharing analysis</strong> &mdash; 18-month roadmap.
+        </div>
+    </div>
+
+    <!-- CATEGORY 5: TEAM -->
+    <div class="cat-header">5 &mdash; Team & Execution</div>
+
+    <div class="qa-item">
+        <div class="qa-question">"Why should we believe a student team can execute this?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            Because we already did. SIKIKA is <strong>deployed. Right now. On Railway.</strong> Real-time transcription, whiteboard analysis, personal sessions, replay, multi-user WebSocket delivery. All built in weeks. What we need is funding to go from <strong>working product &rarr; scaled platform</strong>. University accessibility is best solved by people who sit in those classrooms every day.
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-question">"What's the team's technical background?"</div>
+        <span class="qa-speaker">Iranzi</span>
+        <div class="qa-answer">
+            <strong>Iranzi:</strong> Full-stack developer (Django, JavaScript, real-time systems) &mdash; built entire SIKIKA backend + WebSocket infrastructure. <strong>Deogracia:</strong> Business strategy + go-to-market. <strong>Daisy:</strong> User research + accessibility design. Small team that ships fast. Seed funding includes <strong>2 additional engineers + growth lead</strong>.
+        </div>
+    </div>
+
+    <!-- RESPONSE TEMPLATES + CHECKLIST -->
+    <div class="two-col" style="margin-top: 3mm;">
+        <div class="col">
+            <div class="section-title red-border">Quick-Fire Response Templates</div>
+            <div class="template-box">
+                <div class="template-label">"I don't know"</div>
+                <div class="template-text">"That's a question we haven't fully explored, and I'd rather be honest than guess. What I can tell you is [related thing we DO know]. We'd love to dig into that with you after."</div>
+            </div>
+            <div class="template-box">
+                <div class="template-label">"Outside our scope"</div>
+                <div class="template-text">"Great question. We're laser-focused on [core feature]. We've thought about [their suggestion] — it's on our roadmap for [timeframe], but our priority is nailing the core experience first."</div>
+            </div>
+            <div class="template-box">
+                <div class="template-label">"Redirect to strength"</div>
+                <div class="template-text">"Important consideration. Let me connect it back to what SIKIKA does differently — [strongest point]. That's what makes this viable even given the challenge you're raising."</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="section-title green-border">Final Prep Checklist</div>
+            <ul class="checklist">
+                <li><strong>Each speaker</strong> rehearses their slides 5x out loud with timer</li>
+                <li>Practice <strong>transitions between speakers</strong> (smooth handoffs, no gaps)</li>
+                <li>Iranzi rehearses opening question + <strong>silence</strong> 3x (the pause is everything)</li>
+                <li>Test demo on venue WiFi or have <strong>mobile hotspot backup</strong></li>
+                <li>Have <strong>backup demo script memorized</strong> (Slide 7 backup version)</li>
+                <li>Print <strong>2 copies of judge handout per judge</strong></li>
+                <li>Laptop charged, browser open to SIKIKA <strong>before presenting</strong></li>
+                <li>Close all other tabs + notifications on demo laptop</li>
+                <li>Know the <strong>5-min and 3-min contingency cuts</strong> by heart</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer-left">Team CAMPUS_IQ &middot; March 2026</div>
+        <div class="footer-center"><div class="motto">"We don't replace the interpreter. We replace the need for one."</div></div>
+        <div class="footer-right">INTERNAL PREPARATION ONLY</div>
+    </div>
+</div>
+
+</body>
+</html>

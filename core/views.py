@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.utils import timezone
 from django.db.models import Count, Q
 from .models import (
@@ -12,10 +12,22 @@ from .models import (
 )
 from .forms import RegisterForm, LectureSessionForm, JoinSessionForm, AccessibilityForm
 from . import ai_services
+from pathlib import Path
+from django.conf import settings
 
 
 def home(request):
     return render(request, 'core/home.html')
+
+
+def presentation_room(request):
+    file_path = Path(settings.BASE_DIR) / 'presentation.html'
+    return FileResponse(open(file_path, 'rb'), content_type='text/html')
+
+
+def presentation_final(request):
+    file_path = Path(settings.BASE_DIR) / 'presentation_v2.html'
+    return FileResponse(open(file_path, 'rb'), content_type='text/html')
 
 
 def register(request):
