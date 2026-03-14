@@ -26,7 +26,7 @@
 ### Q: "How does the whiteboard diagram analysis actually work technically?"
 
 **Answer (Iranzi):**
-> "The whiteboard is an HTML5 canvas. As the lecturer draws, every stroke is captured as vector data — coordinates, shapes, connections, and text labels. Our diagram analysis engine doesn't use image recognition — it understands the actual drawing objects. It identifies shapes like rectangles and circles, detects arrows and their connections between shapes, reads text labels, and then generates a natural-language description of the spatial relationships: 'A Client node connects to a Server node via a data flow arrow.' That description is sent to blind students via WebSocket and read aloud. It's deterministic, not probabilistic — so it's reliable and fast."
+> "The whiteboard is an HTML5 canvas. As the lecturer draws, every stroke is captured as vector data — coordinates, shapes, connections, and text labels. Our diagram analysis engine doesn't use image recognition — it understands the actual drawing objects. It identifies shapes like rectangles and circles, detects arrows and their connections between shapes, reads text labels, and then generates a natural-language description of the spatial relationships: 'A Client node connects to a Server node via a data flow arrow.' That description is sent to visually impaired students via WebSocket and read aloud. It's deterministic, not probabilistic — so it's reliable and fast."
 
 ---
 
@@ -79,7 +79,7 @@
 ### Q: "How do you measure actual impact on student outcomes?"
 
 **Answer (Daisy):**
-> "Three metrics. First, content access rate — what percentage of lecture content reaches the student. Research shows deaf students with interpreters get 70 to 80 percent. With SIKIKA captions, they get 95 to 100 percent of the spoken content. Second, for blind students, the metric is visual content access — previously zero for diagrams, now described in real time. Third, session replay usage — students can revisit lectures, which studies show improves retention by 20 to 30 percent. We'll track these through built-in analytics: transcript completeness, session duration, replay frequency, and student satisfaction surveys."
+> "Three metrics. First, content access rate — what percentage of lecture content reaches the student. Research shows deaf students with interpreters get 70 to 80 percent. With SIKIKA captions, they get 95 to 100 percent of the spoken content. Second, for visually impaired students, the metric is visual content access — previously zero for diagrams, now described in real time. Third, session replay usage — students can revisit lectures, which studies show improves retention by 20 to 30 percent. We'll track these through built-in analytics: transcript completeness, session duration, replay frequency, and student satisfaction surveys."
 
 ---
 

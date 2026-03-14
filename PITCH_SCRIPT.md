@@ -29,23 +29,23 @@
 
 **[Walk to center stage. Pause. Look at the judges. Slowly scan the room.]**
 
-> "Before I start, I'd love to ask the judges something."
+> "Look at this judging panel."
 
 **[Pause 2 seconds.]**
 
-> "How many people with disabilities are represented in this room today?"
+> "Why isn't there a single person with a disability sitting among you?"
 
 **[Let the silence land. Don't rush.]**
 
-> "Chances are, very few. And that's not because people with disabilities lack talent or judgment — it's because making this event accessible would require a sign language interpreter at 25 to 60 dollars an hour, braille materials that take weeks to prepare, live captions. Costs that are too high, too complex, or simply overlooked."
+> "It's not because people with disabilities can't judge — they absolutely can. It's because making this event accessible was never prioritized. A sign language interpreter costs 25 to 60 dollars an hour. Braille materials take weeks. Live captions? Not even considered."
 
-> "Now imagine a university lecture hall. Same barriers. Multiplied by millions of students. Every single day."
+> "Every day, deaf and hard-of-hearing students sit in lecture halls hearing nothing. Visually impaired students sit in front of diagrams they cannot see. Two groups. One shared problem: the system was never built for them."
 
 > "My name is Iranzi Innocent. This is Team CAMPUS_IQ. And this — is SIKIKA."
 
 **[Click to Slide 2.]**
 
-**KEY PHRASE TO MEMORIZE:** *"How many people with disabilities are represented in this room today?"*
+**KEY PHRASE TO MEMORIZE:** *"Why isn't there a single person with a disability sitting among you?"*
 
 ---
 
@@ -85,7 +85,7 @@
 
 > "The assumption says: sign language needs a human interpreter. The truth is: text-to-sign avatar technology exists today."
 
-> "The assumption says: blind students can't access visual content. The truth is: computer vision can describe diagrams in natural language."
+> "The assumption says: visually impaired students can't access visual content. The truth is: computer vision can describe diagrams in natural language."
 
 > "The assumption says: this technology is too expensive for Africa. The truth is: a browser, a microphone, and a WebSocket connection cost zero dollars per session."
 
@@ -107,7 +107,7 @@
 
 > "Step three: every student in the room receives the lecture in their preferred format. Simultaneously. Instantly."
 
-> "Step four: deaf students see live captions with technical terms highlighted. Blind students hear audio descriptions. Hard-of-hearing students get sign language avatars."
+> "Step four: deaf and hard-of-hearing students see live captions with technical terms highlighted. Visually impaired students hear audio descriptions. Sign-language users get animated signing."
 
 > "Four pillars make this possible: it's 100% browser-based, it costs zero dollars per session, latency is under one second, and it works on any device — phone, tablet, laptop."
 
@@ -123,7 +123,7 @@
 
 > "Caption Mode — for deaf and hard-of-hearing students. Live transcription appears on screen with smart term highlighting. Technical vocabulary is flagged automatically so students don't miss critical concepts."
 
-> "Audio Mode — for blind and visually impaired students. The transcript is converted to natural speech in real time. Students can adjust speed, pause, and replay."
+> "Audio Mode — for visually impaired students. The transcript is converted to natural speech in real time. Students can adjust speed, pause, and replay."
 
 > "Sign Mode — for students who use sign language as their first language. Text is converted to animated sign language, bridging the gap when no human interpreter is available."
 
@@ -137,7 +137,7 @@
 
 > "Now here's where SIKIKA goes beyond anything that exists today."
 
-> "What happens when a lecturer draws a diagram on the whiteboard? A caption tool doesn't help. An interpreter might describe it — if they understand the subject. A blind student? They get nothing."
+> "What happens when a lecturer draws a diagram on the whiteboard? A caption tool doesn't help. An interpreter might describe it — if they understand the subject. A visually impaired student? They get nothing."
 
 > "SIKIKA has a live whiteboard with a diagram analysis engine."
 
@@ -147,7 +147,7 @@
 
 **[Point to the AI output box.]**
 
-> "It generates this: 'The board shows a system architecture diagram. A Client node connects to a Server node via a data flow arrow. The Server connects to a Database.' Complete spatial understanding. In real time. Read aloud to blind students."
+> "It generates this: 'The board shows a system architecture diagram. A Client node connects to a Server node via a data flow arrow. The Server connects to a Database.' Complete spatial understanding. In real time. Read aloud to visually impaired students."
 
 > "This is not a screen reader. This is a diagram intelligence engine."
 
@@ -189,7 +189,7 @@
 
 > "When I speak, captions appear within one second. Technical terms like 'mitochondria' or 'ribosome' are highlighted automatically — because in STEM lectures, one missed term can mean a lost concept."
 
-> "On the whiteboard side, when the lecturer draws a diagram, SIKIKA's AI reads the shapes, arrows, and labels, then generates a natural-language description: 'The board shows a Client connecting to a Server via a data flow arrow.' That description is read aloud to blind students through their headphones."
+> "On the whiteboard side, when the lecturer draws a diagram, SIKIKA's AI reads the shapes, arrows, and labels, then generates a natural-language description: 'The board shows a Client connecting to a Server via a data flow arrow.' That description is read aloud to visually impaired students through their headphones."
 
 > "This isn't a mockup. This is deployed. This works. Today."
 
@@ -227,7 +227,7 @@
 
 > "A 5 to 10x improvement in content access for deaf students. Previously they caught fragments — now they get full transcripts with term highlighting."
 
-> "A 12 to 16x improvement for blind students. Previously they had zero access to visual content — now the whiteboard speaks to them."
+> "A 12 to 16x improvement for visually impaired students. Previously they had zero access to visual content — now the whiteboard speaks to them."
 
 > "Zero cost per session. 100% availability. No human dependency."
 
@@ -247,11 +247,11 @@
 
 **[Step forward. Speak slowly and deliberately.]**
 
-> "I started by asking how many people with disabilities are represented in this room."
+> "I started by asking why there isn't a single person with a disability on this panel."
 
 > "Here's what I want to leave you with:"
 
-> "The next time this competition is held — a deaf judge should be able to sit on this panel and follow every pitch. A blind judge should be able to understand every diagram. Not because someone was hired to help them — but because the technology was built to include them."
+> "The next time this competition is held — a deaf judge and a visually impaired judge should sit on this panel and follow every pitch. Not because someone was hired to help them. But because the technology was built to include them."
 
 > "That's SIKIKA. That's what we built. And it works today."
 
@@ -259,7 +259,7 @@
 
 **[Nod. Step back. Wait for questions.]**
 
-**KEY PHRASE TO MEMORIZE:** *"A deaf judge should be able to sit on this panel and hear every pitch."*
+**KEY PHRASE TO MEMORIZE:** *"A deaf judge and a visually impaired judge should sit on this panel."*
 
 ---
 
@@ -283,7 +283,7 @@
 - **Deogracia → Iranzi** (after Slide 9): Deogracia says "It's a platform," Iranzi steps forward for the close.
 
 ### Key Phrases to Memorize (All Speakers)
-1. "How many people with disabilities are represented in this room today?"
+1. "Why isn't there a single person with a disability sitting among you?"
 2. "200 interpreters for 54 million people — one for every 270,000 citizens"
 3. "When you strip away assumptions, you don't get a cheaper version — you get an entirely new solution"
 4. "SIKIKA — the Swahili word for 'to be heard'"
@@ -291,7 +291,7 @@
 6. "This isn't a mockup. This is deployed. This works. Today."
 7. "2 cents per student-hour versus 25 to 60 dollars"
 8. "SIKIKA isn't a project. It's a platform."
-9. "A deaf judge should be able to sit on this panel and follow every pitch."
+9. "A deaf judge and a visually impaired judge should sit on this panel."
 
 ---
 
@@ -317,16 +317,16 @@ If told you only have 5 minutes, cut:
 
 Extreme cut — only the essential arc:
 
-> **[Slide 1]** "How many people with disabilities are sitting among you? That discomfort is the problem. I'm Iranzi, Team CAMPUS_IQ, and this is SIKIKA." (20s)
+> **[Slide 1]** "Look at this judging panel. Why isn't there a single person with a disability sitting among you? That's the problem. I'm Iranzi, Team CAMPUS_IQ, and this is SIKIKA." (20s)
 
 > **[Slide 2]** "430 million people have hearing loss. Kenya has 200 sign interpreters for 54 million people. Universities pay up to 300,000 dollars a year, and students still lose 30% of content." (25s)
 
 > **[Slide 4]** "SIKIKA is a browser-based AI platform. Lecturer speaks, AI transcribes in real time, students receive captions, audio, or sign language. Zero cost per session, under one second latency." (25s)
 
-> **[Slide 6]** "And when the lecturer draws a diagram? SIKIKA analyzes it — shapes, arrows, labels — and describes it to blind students in natural language. Not a screen reader. A diagram intelligence engine." (20s)
+> **[Slide 6]** "And when the lecturer draws a diagram? SIKIKA analyzes it — shapes, arrows, labels — and describes it to visually impaired students in natural language. Not a screen reader. A diagram intelligence engine." (20s)
 
 > **[Slide 8]** "The market is 730 million dollars. SIKIKA costs 2 cents per student-hour versus 25-60 dollars for a human interpreter. That's 94% savings." (15s)
 
-> **[Slide 10]** "Next time this competition is held, a deaf judge should be able to hear every pitch. Not because someone was hired to help. Because the technology was built to include them. That's SIKIKA. It works today. Thank you." (20s)
+> **[Slide 10]** "Next time this competition is held, a deaf judge and a visually impaired judge should sit on this panel and follow every pitch. Because the technology was built to include them. That's SIKIKA. It works today. Thank you." (20s)
 
 **Total: ~2 min 5 sec** — leaves room for brief demo or breathing space.
