@@ -29,25 +29,23 @@
 
 **[Walk to center stage. Pause. Look at the judges. Slowly scan the room.]**
 
-> "Before I start, I want to ask the judges a question."
+> "Before I start, I'd love to ask the judges something."
 
 **[Pause 2 seconds.]**
 
-> "How many people with disabilities are sitting among you today?"
+> "How many people with disabilities are represented in this room today?"
 
 **[Let the silence land. Don't rush.]**
 
-> "If that question makes you uncomfortable — good. Because that discomfort is exactly the problem we're here to solve."
+> "Chances are, very few. And that's not because people with disabilities lack talent or judgment — it's because making this event accessible would require a sign language interpreter at 25 to 60 dollars an hour, braille materials that take weeks to prepare, live captions. Costs that are too high, too complex, or simply overlooked."
 
-> "The reason there isn't a deaf judge on this panel isn't because deaf people can't judge. It's because this room wasn't designed for them. There's no interpreter. No captions. No way for a deaf professional to participate as an equal."
-
-> "Now imagine a university lecture hall. Same problem. Multiplied by millions of students. Every single day."
+> "Now imagine a university lecture hall. Same barriers. Multiplied by millions of students. Every single day."
 
 > "My name is Iranzi Innocent. This is Team CAMPUS_IQ. And this — is SIKIKA."
 
 **[Click to Slide 2.]**
 
-**KEY PHRASE TO MEMORIZE:** *"How many people with disabilities are sitting among you today?"*
+**KEY PHRASE TO MEMORIZE:** *"How many people with disabilities are represented in this room today?"*
 
 ---
 
@@ -249,11 +247,11 @@
 
 **[Step forward. Speak slowly and deliberately.]**
 
-> "I started by asking how many people with disabilities are in this room."
+> "I started by asking how many people with disabilities are represented in this room."
 
 > "Here's what I want to leave you with:"
 
-> "The next time this competition is held — a deaf judge should be able to sit on this panel and hear every pitch. A blind judge should be able to see every diagram. Not because someone was hired to help them. But because the technology was built to include them."
+> "The next time this competition is held — a deaf judge should be able to sit on this panel and follow every pitch. A blind judge should be able to understand every diagram. Not because someone was hired to help them — but because the technology was built to include them."
 
 > "That's SIKIKA. That's what we built. And it works today."
 
@@ -285,7 +283,7 @@
 - **Deogracia → Iranzi** (after Slide 9): Deogracia says "It's a platform," Iranzi steps forward for the close.
 
 ### Key Phrases to Memorize (All Speakers)
-1. "How many people with disabilities are sitting among you today?"
+1. "How many people with disabilities are represented in this room today?"
 2. "200 interpreters for 54 million people — one for every 270,000 citizens"
 3. "When you strip away assumptions, you don't get a cheaper version — you get an entirely new solution"
 4. "SIKIKA — the Swahili word for 'to be heard'"
@@ -293,7 +291,7 @@
 6. "This isn't a mockup. This is deployed. This works. Today."
 7. "2 cents per student-hour versus 25 to 60 dollars"
 8. "SIKIKA isn't a project. It's a platform."
-9. "A deaf judge should be able to sit on this panel and hear every pitch."
+9. "A deaf judge should be able to sit on this panel and follow every pitch."
 
 ---
 
