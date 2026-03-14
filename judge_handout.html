@@ -505,29 +505,30 @@
         <p>
             University lectures are delivered through <strong>sound</strong> and <strong>sight</strong>. 
             A deaf student can't access sound. A blind student can't access sight. Both paid full tuition. 
-            The current solution — human interpreters — costs <span class="highlight">$50K–$300K/yr</span>, covers only 
-            <span class="highlight">70–80%</span> of content, and Africa has just <strong>1 interpreter per 270,000 people</strong>. 
-            The math is impossible. <strong>You cannot hire enough humans. The supply does not exist.</strong>
+            Kenya has just <strong>~200 certified sign language interpreters</strong> for 54 million people — that's 
+            <span class="highlight">1 interpreter per 270,000 citizens</span> (KNCHR, 2022). Hiring one costs 
+            <span class="highlight">$25–$60/hr</span>, costing universities $50K–$300K/yr. Even then, 
+            <span class="highlight">20–30% of content is lost</span> (Marschark et al., 2015). <strong>You cannot hire enough humans. The supply does not exist.</strong>
         </p>
     </div>
 
     <!-- STATS ROW -->
     <div class="stats-row">
         <div class="stat-card">
-            <div class="number red">466M</div>
-            <div class="label">People globally with<br>disabling hearing loss</div>
+            <div class="number red">430M+</div>
+            <div class="label">People with disabling<br>hearing loss (WHO, 2021)</div>
         </div>
         <div class="stat-card">
             <div class="number">2.2B</div>
-            <div class="label">People with vision<br>impairment worldwide</div>
+            <div class="label">People with vision<br>impairment (WHO, 2019)</div>
         </div>
         <div class="stat-card">
-            <div class="number orange">~5,000</div>
-            <div class="label">Sign interpreters in<br>ALL of Sub-Saharan Africa</div>
+            <div class="number orange">~200</div>
+            <div class="label">Certified sign interpreters<br>in ALL of Kenya (KNCHR)</div>
         </div>
         <div class="stat-card">
             <div class="number red">20–30%</div>
-            <div class="label">Content LOST even with<br>a human interpreter</div>
+            <div class="label">Content LOST even with<br>interpreter (Marschark, 2015)</div>
         </div>
         <div class="stat-card">
             <div class="number green">$0.02</div>
@@ -568,6 +569,12 @@
                     <td class="icon">🔊</td>
                     <td class="feature">Audio Mode</td>
                     <td class="desc">Slide descriptions read aloud for blind students</td>
+                    <td class="status">✅</td>
+                </tr>
+                <tr>
+                    <td class="icon">🖊️</td>
+                    <td class="feature">Whiteboard AI</td>
+                    <td class="desc">Diagrams analyzed → natural language descriptions spoken to blind students</td>
                     <td class="status">✅</td>
                 </tr>
                 <tr>
@@ -651,6 +658,11 @@
                         <td class="good">Full audio mode</td>
                     </tr>
                     <tr>
+                        <td>Whiteboard/diagrams</td>
+                        <td class="bad">Invisible to blind</td>
+                        <td class="good">AI-described aloud</td>
+                    </tr>
+                    <tr>
                         <td>Post-lecture materials</td>
                         <td class="bad">Nothing</td>
                         <td class="good">Transcript + Quiz</td>
@@ -727,20 +739,20 @@
                 <span class="pill core">Django + Channels</span>
                 <span class="pill core">WebSocket Real-time</span>
                 <span class="pill core">Pure Python NLP</span>
+                <span class="pill core">Canvas Diagram AI</span>
                 <span class="pill free">Web Speech API — FREE</span>
                 <span class="pill free">Speech Synthesis — FREE</span>
                 <span class="pill free">No APIs — $0/session</span>
-                <span class="pill">Bootstrap 5</span>
                 <span class="pill">ARIA + WCAG 2.1</span>
             </div>
             <div style="margin-top: 3mm;">
                 <div class="section-title" style="margin-bottom: 1.5mm;">Why We Win</div>
                 <ul class="impact-list">
                     <li><strong>Only tool serving deaf AND blind</strong> from one session</li>
+                    <li><strong>Whiteboard diagram AI</strong> — no other tool describes drawings for blind students</li>
                     <li><strong>Africa-first</strong> — built for low bandwidth, mobile-first</li>
                     <li><strong>Academic intelligence</strong> — not just transcription</li>
                     <li><strong>Zero cost for students</strong> — browser only</li>
-                    <li><strong>Two-way communication</strong> — students can participate</li>
                     <li>Institutions <strong>already spending more</strong> on worse solutions</li>
                 </ul>
             </div>
@@ -758,7 +770,7 @@
         </div>
         <div class="footer-right">
             USIU-Africa Innovation Challenge<br>
-            <a href="#">sikika.africa</a>
+            <span style="font-size:5.5pt; color:#bbb;">Sources: WHO 2021, 2019; KNCHR 2022; WASLI; Marschark et al. 2015; Napier 2014; HolonIQ 2024</span>
         </div>
     </div>
 

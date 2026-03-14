@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIKIKA — USIU-Africa Innovation Challenge 2026</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a1628;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 80px;
+            position: relative;
+            background: #0a1628;
+        }
+
+        .slide.active { display: flex; }
+
+        /* Typography */
+        .label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #e8a838;
+            margin-bottom: 40px;
+        }
+
+        .label-red { color: #e84040; }
+        .label-white { color: rgba(255,255,255,0.4); }
+        .label-green { color: #38e870; }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 64px;
+            line-height: 1.15;
+            margin-bottom: 28px;
+            max-width: 1000px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 50px;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            max-width: 900px;
+        }
+
+        .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.65);
+            line-height: 1.8;
+            max-width: 700px;
+        }
+
+        .orange { color: #e8a838; }
+        .red { color: #e84040; }
+        .green { color: #38e870; }
+        .gold { color: #f0c040; }
+
+        .source {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.2);
+            margin-top: 4px;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            gap: 80px;
+            margin: 50px 0 30px 0;
+            justify-content: center;
+        }
+
+        .stat { text-align: center; }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.45);
+            max-width: 180px;
+        }
+
+        /* Comparison columns */
+        .comparison {
+            display: flex;
+            gap: 0;
+            margin: 40px 0;
+            max-width: 860px;
+            width: 100%;
+        }
+
+        .comparison-col {
+            flex: 1;
+            padding: 28px;
+        }
+
+        .comparison-col.old {
+            background: rgba(232,64,64,0.06);
+            border-radius: 14px 0 0 14px;
+            border: 1px solid rgba(232,64,64,0.12);
+            border-right: none;
+        }
+
+        .comparison-col.new {
+            background: rgba(56,232,112,0.06);
+            border-radius: 0 14px 14px 0;
+            border: 1px solid rgba(56,232,112,0.12);
+            border-left: none;
+        }
+
+        .comparison-col h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .comparison-col ul { list-style: none; }
+
+        .comparison-col li {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.6);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            line-height: 1.5;
+        }
+
+        .comparison-col li:last-child { border-bottom: none; }
+
+        /* Flow */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 40px 0;
+            justify-content: center;
+        }
+
+        .flow-step {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 22px 24px;
+            text-align: center;
+            min-width: 155px;
+        }
+
+        .flow-step .step-icon { font-size: 28px; margin-bottom: 8px; }
+
+        .flow-step .step-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.4;
+        }
+
+        .flow-arrow { font-size: 22px; color: #e8a838; }
+
+        /* Mode cards */
+        .modes-grid {
+            display: flex;
+            gap: 24px;
+            margin: 40px 0 16px 0;
+            justify-content: center;
+        }
+
+        .mode-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 28px 22px;
+            width: 220px;
+            text-align: center;
+        }
+
+        .mode-icon { font-size: 36px; margin-bottom: 12px; }
+
+        .mode-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .mode-for {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            color: #e8a838;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .mode-desc {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+
+        /* Caption demo */
+        .demo-box {
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 28px 36px;
+            max-width: 680px;
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .demo-box .live-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #e84040;
+            margin-bottom: 16px;
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            background: #e84040;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+        .demo-box .caption-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+        }
+
+        .term { color: #e8a838; border-bottom: 1px dashed rgba(232,168,56,0.4); }
+
+        .term-def {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: rgba(232,168,56,0.6);
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .term-def strong { color: #e8a838; }
+
+        /* Team */
+        .team-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .team-name-pill {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .team-name-pill .major {
+            font-size: 12px;
+            font-weight: 300;
+            color: #e8a838;
+        }
+
+        /* Divider */
+        .divider {
+            width: 50px; height: 3px;
+            background: #e8a838;
+            margin: 24px auto;
+            border-radius: 2px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            background: rgba(232,168,56,0.1);
+            border: 1px solid rgba(232,168,56,0.2);
+            border-radius: 100px;
+            padding: 6px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #e8a838;
+            margin-bottom: 24px;
+        }
+
+        /* Whiteboard showcase */
+        .wb-showcase {
+            display: flex;
+            gap: 36px;
+            margin: 32px 0;
+            max-width: 880px;
+            align-items: stretch;
+        }
+
+        .wb-left {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: left;
+        }
+
+        .wb-left .wb-sketch {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .wb-sketch-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .wb-sketch svg { width: 100%; height: auto; }
+
+        .wb-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .wb-ai-output {
+            background: rgba(56,232,112,0.06);
+            border: 1px solid rgba(56,232,112,0.15);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .wb-ai-output .ai-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #38e870;
+            margin-bottom: 10px;
+        }
+
+        .wb-ai-output .ai-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+
+        .wb-ai-output .ai-text strong { color: #38e870; font-weight: 500; }
+
+        .wb-key-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(232,168,56,0.08);
+            border: 1px solid rgba(232,168,56,0.2);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .wb-key-badge kbd {
+            background: rgba(232,168,56,0.2);
+            color: #e8a838;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Business grid */
+        .biz-grid {
+            display: flex;
+            gap: 24px;
+            margin: 36px 0 20px 0;
+            justify-content: center;
+        }
+
+        .biz-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 24px 20px;
+            width: 200px;
+            text-align: center;
+        }
+
+        .biz-card .biz-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .biz-card .biz-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.4;
+        }
+
+        /* Impact list */
+        .impact-grid {
+            display: flex;
+            gap: 28px;
+            margin: 36px 0 16px 0;
+            justify-content: center;
+            text-align: left;
+        }
+
+        .impact-col {
+            max-width: 380px;
+        }
+
+        .impact-col h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid;
+        }
+
+        .impact-item {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.6);
+            padding: 6px 0;
+            line-height: 1.5;
+        }
+
+        .impact-item strong { font-weight: 600; color: rgba(255,255,255,0.9); }
+
+        .impact-item .num { color: #38e870; font-weight: 600; }
+        .impact-item .num-gold { color: #e8a838; font-weight: 600; }
+
+        /* Fact table */
+        .fact-table {
+            width: 100%;
+            max-width: 820px;
+            border-collapse: collapse;
+            margin: 30px 0 10px 0;
+        }
+
+        .fact-table td {
+            font-family: 'Inter', sans-serif;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+            line-height: 1.5;
+        }
+
+        .fact-table .fact-label {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.5);
+            width: 50%;
+        }
+
+        .fact-table .fact-value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .fact-table .fact-source {
+            font-size: 10px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.2);
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 0; right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 100;
+        }
+
+        .nav-hint {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.15);
+        }
+
+        .nav-counter {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #e8a838, #e84040);
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 1: THE CHALLENGE
+     Purpose: Emotional hook. Challenge judges directly. Introduce SIKIKA.
+     Time: ~60 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide active" id="slide-1">
+    <div class="label label-red">A QUESTION FOR THE JUDGES</div>
+    <h2 style="font-size: 42px; max-width: 1000px; line-height: 1.35;">
+        Look at this judging panel.<br>
+        How many people with disabilities<br>
+        are <span class="red">sitting among you?</span>
+    </h2>
+    <p class="subtitle" style="max-width: 760px; margin: 20px 0 24px 0; font-size:17px;">
+        Probably none. Not because disabled people can't judge. Because making this event accessible &mdash;
+        hiring a sign language interpreter at <strong style="color:#e84040">$25&ndash;$60/hour</strong>,
+        preparing braille materials that take <strong style="color:#e84040">weeks</strong>,
+        adding live captions &mdash; was too expensive, too complicated, or simply never considered.
+    </p>
+    <p style="font-family:'Inter',sans-serif; font-size:17px; font-weight:500; color:rgba(255,255,255,0.8); max-width:700px; line-height:1.6;">
+        That is the problem.<br>
+        And that is <span class="orange" style="font-weight:700;">exactly</span> what we solve.
+    </p>
+    <div class="divider"></div>
+    <p style="font-family:'Space Grotesk',sans-serif; font-size:32px; font-weight:600; margin-top: 8px;">
+        <span class="orange">SIKIKA</span>
+        <span style="color:rgba(255,255,255,0.35); font-size:17px; font-weight:300; margin-left:12px;">"to be heard" &mdash; Swahili</span>
+    </p>
+    <p style="font-family:'Inter',sans-serif; font-size:13px; color:rgba(255,255,255,0.25); margin-top:6px;">
+        Team CAMPUS_IQ &mdash; Iranzi Innocent &middot; Deogracia &middot; Daisy
+    </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 2: THE NUMBERS
+     Purpose: Establish the problem with hard, sourced facts.
+     Time: ~75 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-2">
+    <div class="label label-red">THE PROBLEM &mdash; BY THE NUMBERS</div>
+    <h2 style="font-size: 40px;">
+        The facts are <span class="red">undeniable.</span>
+    </h2>
+    <table class="fact-table">
+        <tr>
+            <td class="fact-label">People with disabling hearing loss worldwide</td>
+            <td class="fact-value red">430 million</td>
+            <td class="fact-source">WHO, World Report on Hearing, 2021</td>
+        </tr>
+        <tr>
+            <td class="fact-label">People with vision impairment worldwide</td>
+            <td class="fact-value" style="color:#5ec4e8">2.2 billion</td>
+            <td class="fact-source">WHO, World Vision Report, 2019</td>
+        </tr>
+        <tr>
+            <td class="fact-label">Certified sign language interpreters in ALL of Kenya</td>
+            <td class="fact-value red">~200</td>
+            <td class="fact-source">KNCHR Disability Report, 2022; WASLI</td>
+        </tr>
+        <tr>
+            <td class="fact-label">That means one interpreter for every</td>
+            <td class="fact-value gold">270,000 Kenyans</td>
+            <td class="fact-source">54M population / ~200 interpreters</td>
+        </tr>
+        <tr>
+            <td class="fact-label">Cost of one interpreter per university per year</td>
+            <td class="fact-value red">$50,000 &ndash; $300,000</td>
+            <td class="fact-source">$25&ndash;$60/hr &times; 5hrs/day &times; 200 days</td>
+        </tr>
+        <tr>
+            <td class="fact-label">Content LOST even with a human interpreter</td>
+            <td class="fact-value red">20&ndash;30%</td>
+            <td class="fact-source">Marschark et al., 2015; Napier, 2014</td>
+        </tr>
+        <tr>
+            <td class="fact-label">Real-time accessibility tools built for African universities</td>
+            <td class="fact-value" style="color:#fff; font-size:20px;">0</td>
+            <td class="fact-source"></td>
+        </tr>
+    </table>
+    <p style="font-family:'Inter',sans-serif; font-size:16px; font-weight:600; color:rgba(255,255,255,0.7); margin-top:14px;">
+        You cannot hire enough humans. The supply <span class="red">does not exist.</span>
+    </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 3: FIRST PRINCIPLES
+     Purpose: Reframe the problem. Break assumptions.
+     Time: ~45 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-3">
+    <div class="label">FIRST PRINCIPLES</div>
+    <h2>Strip it to <span class="orange">atoms.</span></h2>
+    <div class="comparison">
+        <div class="comparison-col old">
+            <h4 class="red">&#10007; What people assume</h4>
+            <ul>
+                <li>"We need to hire more interpreters"</li>
+                <li>"Deaf students need sign language"</li>
+                <li>"Accessibility requires expensive hardware"</li>
+                <li>"This affects a small number of people"</li>
+            </ul>
+        </div>
+        <div class="comparison-col new">
+            <h4 class="green">&#10003; What is actually true</h4>
+            <ul>
+                <li>Training one interpreter takes <strong style="color:#fff">2&ndash;4 years</strong>. You can't scale humans.</li>
+                <li>Students need the <strong style="color:#fff">information</strong>, not a specific medium</li>
+                <li>Every student already owns a <strong style="color:#fff">phone with a browser</strong></li>
+                <li><strong style="color:#fff">15%</strong> of humanity &mdash; 1.3 billion people &mdash; is not niche</li>
+            </ul>
+        </div>
+    </div>
+    <p style="font-family:'Inter',sans-serif; font-size: 17px; font-weight: 500; color: rgba(255,255,255,0.6); margin-top: 10px;">
+        A lecture is <span class="orange" style="font-weight:700">sound</span> + <span style="color:#5ec4e8; font-weight:700">visuals</span>.
+        AI converts between formats <span class="green">for free</span>.
+    </p>
+    <p class="source" style="margin-top:12px;">Source: WHO World Report on Disability, 2011 (updated 2023) &mdash; 15% global disability prevalence</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 4: THE SOLUTION + HOW IT WORKS
+     Purpose: Introduce SIKIKA. Show the 3-step flow.
+     Time: ~60 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-4">
+    <div class="label">THE SOLUTION</div>
+    <h1 style="font-size: 72px;"><span class="orange">SIKIKA</span></h1>
+    <p class="subtitle" style="font-size: 19px; color: rgba(255,255,255,0.75); max-width: 720px; margin-bottom: 12px;">
+        Real-time AI that converts live lectures into captions, audio descriptions, and sign language &mdash; on the student's own device. Zero cost. Zero install.
+    </p>
+    <div class="flow">
+        <div class="flow-step">
+            <div class="step-icon">🎙️</div>
+            <div class="step-text"><strong style="color:#fff">Lecturer</strong><br>speaks into mic</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <div class="step-icon">🧠</div>
+            <div class="step-text"><strong style="color:#fff">AI</strong><br>processes speech</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <div class="step-icon">📱</div>
+            <div class="step-text"><strong style="color:#fff">Students</strong><br>join via code</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <div class="step-icon">✨</div>
+            <div class="step-text"><strong style="color:#fff">Receive</strong><br>in their format</div>
+        </div>
+    </div>
+    <div style="display:flex; gap:60px; margin-top:10px; justify-content:center;">
+        <div style="text-align:center;">
+            <p style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:rgba(255,255,255,0.5);">Browser-based</p>
+            <p style="font-family:'Inter',sans-serif; font-size:12px; color:rgba(255,255,255,0.25);">No app install needed</p>
+        </div>
+        <div style="text-align:center;">
+            <p style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:rgba(255,255,255,0.5);">$0 per session</p>
+            <p style="font-family:'Inter',sans-serif; font-size:12px; color:rgba(255,255,255,0.25);">Free browser APIs only</p>
+        </div>
+        <div style="text-align:center;">
+            <p style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:rgba(255,255,255,0.5);">&lt;1 second latency</p>
+            <p style="font-family:'Inter',sans-serif; font-size:12px; color:rgba(255,255,255,0.25);">Real-time, not delayed</p>
+        </div>
+        <div style="text-align:center;">
+            <p style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:rgba(255,255,255,0.5);">Any device</p>
+            <p style="font-family:'Inter',sans-serif; font-size:12px; color:rgba(255,255,255,0.25);">Phone, tablet, or laptop</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 5: THREE MODES
+     Purpose: Show the three accessibility modes.
+     Time: ~45 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-5">
+    <div class="label">ACCESSIBILITY MODES</div>
+    <h2>One lecture. <span class="orange">Three experiences.</span></h2>
+    <div class="modes-grid">
+        <div class="mode-card">
+            <div class="mode-icon">🔤</div>
+            <div class="mode-title">Smart Captions</div>
+            <div class="mode-for">Deaf / Hard-of-hearing</div>
+            <div class="mode-desc">Live AI captions with technical terms auto-detected and defined inline. Full transcript generated.</div>
+        </div>
+        <div class="mode-card">
+            <div class="mode-icon">🔊</div>
+            <div class="mode-title">Audio Description</div>
+            <div class="mode-for">Blind / Low-vision</div>
+            <div class="mode-desc">AI describes slides and whiteboard diagrams aloud. Keyboard shortcuts for full control.</div>
+        </div>
+        <div class="mode-card">
+            <div class="mode-icon">🤟</div>
+            <div class="mode-title">Sign Language</div>
+            <div class="mode-for">Sign-preferred</div>
+            <div class="mode-desc">Captions paired with sign language display for technical vocabulary.</div>
+        </div>
+    </div>
+    <p style="font-family:'Inter',sans-serif; font-size:15px; font-weight:400; color:rgba(255,255,255,0.4); margin-top:8px;">
+        Plus: real-time Q&amp;A for deaf students, AI-generated summaries, auto-quizzes, session replay, lecturer analytics
+    </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 6: THE INNOVATION — WHITEBOARD
+     Purpose: The "wow" moment. Diagram analysis for blind students.
+     Time: ~60 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-6">
+    <div class="label label-green">THE INNOVATION</div>
+    <h2 style="font-size: 42px;">Diagrams a blind student<br>can <span class="green">hear.</span></h2>
+    <div class="wb-showcase">
+        <div class="wb-left">
+            <div class="wb-sketch-label">Lecturer draws this on the whiteboard</div>
+            <div class="wb-sketch">
+                <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="110" y="15" width="100" height="40" rx="6" fill="none" stroke="#0a1628" stroke-width="2"/>
+                    <text x="160" y="40" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" font-weight="600" fill="#0a1628">Client</text>
+                    <rect x="20" y="120" width="100" height="40" rx="6" fill="none" stroke="#0a1628" stroke-width="2"/>
+                    <text x="70" y="145" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" font-weight="600" fill="#0a1628">Server</text>
+                    <ellipse cx="250" cy="140" rx="50" ry="28" fill="none" stroke="#0a1628" stroke-width="2"/>
+                    <text x="250" y="145" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" font-weight="600" fill="#0a1628">Database</text>
+                    <line x1="130" y1="55" x2="85" y2="118" stroke="#e84040" stroke-width="2"/>
+                    <polygon points="85,118 93,108 80,110" fill="#e84040"/>
+                    <line x1="120" y1="140" x2="198" y2="140" stroke="#e84040" stroke-width="2"/>
+                    <polygon points="198,140 190,134 190,146" fill="#e84040"/>
+                </svg>
+            </div>
+        </div>
+        <div class="wb-right">
+            <div class="wb-ai-output">
+                <div class="ai-label">Blind student hears this instantly</div>
+                <p class="ai-text">
+                    "<strong>Flowchart</strong> with 3 elements. A rectangle labeled <strong>'Client'</strong> at the top center.
+                    Arrow from Client pointing to <strong>'Server'</strong> at the bottom-left.
+                    Arrow from Server pointing to an ellipse labeled <strong>'Database'</strong> on the right."
+                </p>
+            </div>
+            <div class="wb-ai-output" style="background: rgba(232,168,56,0.06); border-color: rgba(232,168,56,0.15);">
+                <div class="ai-label" style="color:#e8a838;">Not a screen reader. A diagram intelligence engine.</div>
+                <p class="ai-text" style="font-size:12px;">
+                    Identifies shapes, arrows, and text labels. Computes spatial positions. Traces arrow connections between named objects. Infers diagram type. Speaks it aloud via text-to-speech.
+                </p>
+            </div>
+            <div class="wb-key-badge">
+                <kbd>W</kbd> Press anytime to re-hear the whiteboard description
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 7: LIVE DEMO
+     Purpose: Show the product actually working.
+     Time: ~90 seconds (flexible)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-7">
+    <div class="label">LIVE DEMO</div>
+    <h2 style="font-size: 44px;">See it <span class="orange">work.</span></h2>
+    <div class="demo-box" style="max-width:720px;">
+        <div class="live-label"><span class="live-dot"></span> LIVE CAPTION MODE &mdash; Deaf Student View</div>
+        <p class="caption-text">
+            "...so when we talk about
+            <span class="term">normalization</span>, the goal is to reduce
+            <span class="term">data redundancy</span> in your database schema..."
+        </p>
+        <p class="term-def">
+            &#8505;&#65039; <strong>data redundancy</strong> &mdash; when the same data is stored in multiple places, wasting space and causing inconsistencies.
+        </p>
+    </div>
+    <p class="subtitle" style="font-size:16px; color:rgba(255,255,255,0.5);">
+        Lecturer speaks naturally &rarr; AI converts in real-time &rarr; Deaf student reads, blind student listens
+    </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 8: THE BUSINESS
+     Purpose: Show this is viable, not just a school project.
+     Time: ~60 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-8">
+    <div class="label">THE BUSINESS CASE</div>
+    <h2 style="font-size: 40px;">We don't cost money.<br>We <span class="green">save</span> money.</h2>
+    <div class="biz-grid">
+        <div class="biz-card">
+            <div class="biz-num orange">$730M</div>
+            <div class="biz-label">Total addressable<br>market (global)</div>
+        </div>
+        <div class="biz-card">
+            <div class="biz-num green">$0.02</div>
+            <div class="biz-label">SIKIKA cost per<br>student-hour</div>
+        </div>
+        <div class="biz-card">
+            <div class="biz-num red">$25&ndash;60</div>
+            <div class="biz-label">Interpreter cost per<br>student-hour</div>
+        </div>
+        <div class="biz-card">
+            <div class="biz-num green">89&ndash;94%</div>
+            <div class="biz-label">Cost savings<br>for universities</div>
+        </div>
+    </div>
+    <div class="comparison" style="margin:20px 0 10px 0; max-width:700px;">
+        <div class="comparison-col old" style="padding:20px; border-radius:14px 0 0 14px;">
+            <h4 class="red" style="font-size:11px; margin-bottom:12px;">&#10007; University pays for one interpreter</h4>
+            <ul>
+                <li style="font-size:13px; padding:5px 0;">$30/hr &times; 5 hrs &times; 200 days = <strong style="color:#e84040">$30,000/yr</strong></li>
+                <li style="font-size:13px; padding:5px 0;">Covers <strong style="color:#e84040">1&ndash;2 students</strong></li>
+                <li style="font-size:13px; padding:5px 0;">20&ndash;30% content lost</li>
+                <li style="font-size:13px; padding:5px 0;">Zero blind student support</li>
+            </ul>
+        </div>
+        <div class="comparison-col new" style="padding:20px; border-radius:0 14px 14px 0;">
+            <h4 class="green" style="font-size:11px; margin-bottom:12px;">&#10003; University pays for SIKIKA</h4>
+            <ul>
+                <li style="font-size:13px; padding:5px 0;">$2,000&ndash;$15,000/yr institutional license</li>
+                <li style="font-size:13px; padding:5px 0;">Covers <strong style="color:#38e870">unlimited students</strong></li>
+                <li style="font-size:13px; padding:5px 0;">~100% content captured</li>
+                <li style="font-size:13px; padding:5px 0;">Deaf + blind + all students benefit</li>
+            </ul>
+        </div>
+    </div>
+    <p class="source">Market sizing based on HolonIQ EdTech 2024, UNESCO UIS enrollment data, interpreter cost data from WASLI and KNCHR reports</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 9: THE IMPACT
+     Purpose: Social impact + what's next.
+     Time: ~45 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-9">
+    <div class="label">THE IMPACT</div>
+    <h2 style="font-size:40px;">What changes when every lecture<br>is <span class="green">accessible.</span></h2>
+    <div class="impact-grid">
+        <div class="impact-col">
+            <h4 style="color:#38e870; border-color:#38e870;">What SIKIKA delivers today</h4>
+            <div class="impact-item"><span class="num">5&times;&ndash;10&times;</span> more content access for deaf students without interpreters</div>
+            <div class="impact-item"><span class="num">12&times;&ndash;16&times;</span> more visual content access for blind students</div>
+            <div class="impact-item"><span class="num">$0</span> cost to students &mdash; just open a browser</div>
+            <div class="impact-item"><span class="num">100%</span> availability &mdash; every lecture, no interpreter dependency</div>
+            <div class="impact-item"><span class="num">Auto-generated</span> transcripts, summaries, and quizzes</div>
+        </div>
+        <div class="impact-col">
+            <h4 style="color:#e8a838; border-color:#e8a838;">Where we go next</h4>
+            <div class="impact-item"><span class="num-gold">3D sign language avatar</span> &mdash; real-time animated signing</div>
+            <div class="impact-item"><span class="num-gold">Vision AI</span> &mdash; auto-describe uploaded slides</div>
+            <div class="impact-item"><span class="num-gold">20+ languages</span> &mdash; Swahili, French, Arabic, and more</div>
+            <div class="impact-item"><span class="num-gold">LMS integration</span> &mdash; Moodle, Canvas, Blackboard</div>
+            <div class="impact-item"><span class="num-gold">200+ universities</span> across 15 African countries by Year 3</div>
+        </div>
+    </div>
+    <p class="source" style="margin-top:8px;">Content access improvement estimates based on Marschark et al. (2015), Richardson (2009), Supalo (2010)</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 10: THE CLOSE
+     Purpose: Memorable ending. Full circle back to the judge challenge.
+     Time: ~30 seconds
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-10">
+    <div class="badge">USIU-AFRICA INNOVATION CHALLENGE 2026</div>
+    <h1 style="font-size: 84px;"><span class="orange">SIKIKA</span></h1>
+    <p style="font-family:'Playfair Display',serif; font-style:italic; font-size:26px; color:rgba(255,255,255,0.65); max-width:700px; line-height:1.5; margin-bottom: 12px;">
+        "Next time this competition is held,<br>
+        a deaf judge should be able to sit on this panel<br>
+        <span style="color:#e8a838;">and hear every pitch.</span>"
+    </p>
+    <div class="divider"></div>
+    <p style="font-family:'Inter',sans-serif; font-size:16px; color:rgba(255,255,255,0.5); margin-top: 6px;">
+        <strong style="color:rgba(255,255,255,0.7);">Iranzi Innocent</strong>
+        <span style="color:rgba(255,255,255,0.2);">&middot;</span>
+        <strong style="color:rgba(255,255,255,0.7);">Deogracia</strong>
+        <span style="color:rgba(255,255,255,0.2);">&middot;</span>
+        <strong style="color:rgba(255,255,255,0.7);">Daisy</strong>
+    </p>
+    <p style="font-family:'Inter',sans-serif; font-size:12px; color:rgba(255,255,255,0.2); margin-top:6px;">
+        Team CAMPUS_IQ &mdash; Data Science &middot; Applied Computer Technology
+    </p>
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav-bar">
+    <span class="nav-hint">&larr; &rarr; or click to navigate</span>
+    <span class="nav-counter" id="navCounter">1 / 10</span>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+
+    function show(i) {
+        if (i < 0 || i >= total) return;
+        slides[current].classList.remove('active');
+        current = i;
+        slides[current].classList.add('active');
+        document.getElementById('navCounter').textContent = (current + 1) + ' / ' + total;
+        document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); show(current + 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); show(current - 1); }
+        else if (e.key === 'Home') { e.preventDefault(); show(0); }
+        else if (e.key === 'End') { e.preventDefault(); show(total - 1); }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.nav-bar')) return;
+        e.clientX > window.innerWidth / 2 ? show(current + 1) : show(current - 1);
+    });
+
+    var touchX = 0;
+    document.addEventListener('touchstart', function(e) { touchX = e.touches[0].clientX; });
+    document.addEventListener('touchend', function(e) {
+        var d = touchX - e.changedTouches[0].clientX;
+        if (Math.abs(d) > 50) d > 0 ? show(current + 1) : show(current - 1);
+    });
+
+    show(0);
+</script>
+
+</body>
+</html>
